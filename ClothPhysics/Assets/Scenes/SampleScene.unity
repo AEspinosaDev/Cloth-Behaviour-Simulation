@@ -248,25 +248,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64ea09637adbe6041bed55d9f421aca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SolvingMethod: 1
   m_TimeStep: 0.02
   m_Substeps: 5
-  m_Gravity: {x: 0, y: -9.81, z: 0}
   m_Paused: 1
-  m_TractionStiffness: 20
-  m_FlexionStiffness: 15
-  m_NodeMass: 0.03
-  m_NodeDamping: 0.3
-  m_SpringDamping: 0.3
-  m_SolvingMethod: 1
-  m_AffectedByWind: 1
-  m_WindFriction: 0.5
+  m_AffectedByWind: 0
   m_FixingByTexture: 1
+  m_CanCollide: 0
+  m_WindFriction: 0.5
+  m_WindSolverPrecission: 1
   m_Texture: {fileID: 2800000, guid: b0c4f64a0ff6e024ca5aa5d2ef473308, type: 3}
   m_Fixers:
   - {fileID: 0}
-  m_CanCollide: 0
   m_CollidingObjects: []
-  m_PenaltyForcePrecission: 1
 --- !u!64 &780510720
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -300,7 +294,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 43b7066f66d2ccd47a6f434b0f52134c, type: 2}
+  - {fileID: 2100000, guid: 9afdfb11792d1a64aae8f7020ea8fcaf, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -443,7 +437,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 41130df35c1ec7648bddeba5bbfe00c0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 43b7066f66d2ccd47a6f434b0f52134c, type: 2}
+      objectReference: {fileID: 2100000, guid: 80ae12859d6beda4789e835f0d944cd5, type: 2}
     - target: {fileID: 919132149155446097, guid: 41130df35c1ec7648bddeba5bbfe00c0, type: 3}
       propertyPath: m_Name
       value: 50_Plane
@@ -660,27 +654,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64ea09637adbe6041bed55d9f421aca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SolvingMethod: 1
   m_TimeStep: 0.02
   m_Substeps: 5
-  m_Gravity: {x: 0, y: -9.81, z: 0}
   m_Paused: 1
-  m_TractionStiffness: 12
-  m_FlexionStiffness: 8
-  m_NodeMass: 0.03
-  m_NodeDamping: 0.3
-  m_SpringDamping: 0.3
-  m_SolvingMethod: 1
-  m_AffectedByWind: 0
-  m_WindFriction: 0.5
+  m_AffectedByWind: 1
   m_FixingByTexture: 0
+  m_CanCollide: 1
+  m_WindFriction: 0.5
+  m_WindSolverPrecission: 1
   m_Texture: {fileID: 2800000, guid: b0c4f64a0ff6e024ca5aa5d2ef473308, type: 3}
   m_Fixers:
   - {fileID: 1864401386}
-  m_CanCollide: 1
   m_CollidingObjects:
   - {fileID: 1549091143}
-  - {fileID: 0}
-  m_PenaltyForcePrecission: 1
 --- !u!64 &1711547926
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -916,22 +903,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64ea09637adbe6041bed55d9f421aca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SolvingMethod: 1
   m_TimeStep: 0.007
   m_Substeps: 1
-  m_Gravity: {x: 0, y: -9.81, z: 0}
   m_Paused: 1
-  m_TractionStiffness: 20
-  m_FlexionStiffness: 15
-  m_NodeMass: 0.03
-  m_NodeDamping: 0.3
-  m_SpringDamping: 0.3
-  m_SolvingMethod: 1
   m_AffectedByWind: 0
-  m_WindFriction: 0.5
   m_FixingByTexture: 1
-  m_Texture: {fileID: 2800000, guid: b0c4f64a0ff6e024ca5aa5d2ef473308, type: 3}
-  m_Fixers: []
   m_CanCollide: 0
+  m_WindFriction: 0.5
+  m_WindSolverPrecission: 1
+  m_Texture: {fileID: 2800000, guid: 036676216064c4948ab8b486600cd74b, type: 3}
+  m_Fixers: []
   m_CollidingObjects:
   - {fileID: 1549091143}
-  m_PenaltyForcePrecission: 0

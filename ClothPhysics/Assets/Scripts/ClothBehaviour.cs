@@ -2,11 +2,15 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using VectorXD = MathNet.Numerics.LinearAlgebra.Vector<double>;
+using MatrixXD = MathNet.Numerics.LinearAlgebra.Matrix<double>;
+using DenseVectorXD = MathNet.Numerics.LinearAlgebra.Double.DenseVector;
+using DenseMatrixXD = MathNet.Numerics.LinearAlgebra.Double.DenseMatrix;
+
 
 /// <summary>
-/// Cloth physics manager. Add this to a Scene Object with a mesh and flow the wind
+/// Cloth physics manager. Add this to a Scene Object with a mesh and let it flow with the wind
 /// </summary>
-
 
 public class ClothBehaviour : MonoBehaviour
 {
@@ -15,9 +19,11 @@ public class ClothBehaviour : MonoBehaviour
     [HideInInspector] Mesh m_Mesh;
 
     [HideInInspector] private Vector3[] m_Vertices;
+
     [HideInInspector] private int[] m_Triangles;
 
     [HideInInspector] private List<Node> m_Nodes;
+
     [HideInInspector] private List<Spring> m_Springs;
 
     [HideInInspector] private List<Node> m_FixedNodes;
@@ -26,43 +32,52 @@ public class ClothBehaviour : MonoBehaviour
 
     [HideInInspector] private Vector3 m_AverageWindVelocity;
 
+    [HideInInspector] private float m_SubTimeStep;
+
     #endregion 
 
 
     #region InEditorVariables
 
+    [SerializeField] public Solver m_SolvingMethod;
+
     [SerializeField] [Range(0.001f, 0.02f)] private float m_TimeStep;
+
     [SerializeField] [Range(1, 20)] private int m_Substeps;
 
-    [SerializeField] public Vector3 m_Gravity;
+    [SerializeField] public bool m_Paused;
 
-    [SerializeField] private bool m_Paused;
+    //------Managed by custom editor class-----//
 
-    [SerializeField] private float m_TractionStiffness;
-    [SerializeField] private float m_FlexionStiffness;
+    public Ref<Vector3> m_Gravity = new Ref<Vector3>();
 
-    [SerializeField] private float m_NodeMass;
+    public Ref<float> m_NodeMass = new Ref<float>();
 
-    [SerializeField] private float m_NodeDamping;
-    [SerializeField] private float m_SpringDamping;
+    public Ref<float> m_NodeDamping = new Ref<float>();
 
-    [SerializeField] private Solver m_SolvingMethod;
+    public Ref<float> m_SpringDamping = new Ref<float>();
 
+    public Ref<float> m_TractionStiffness = new Ref<float>();
+
+    public Ref<float> m_FlexionStiffness = new Ref<float>();
+
+    [HideInInspector] public bool m_AffectedByWind;
+
+    [HideInInspector] public bool m_FixingByTexture;
+
+    [HideInInspector] public bool m_CanCollide;
     #endregion
 
     #region ConditionalInEditorVariables
-    //------Toggled by custom editor only if enabled-----//
+    //------Toggled by custom editor class only if enabled-----//
 
-    [HideInInspector] public bool m_AffectedByWind;
     [HideInInspector] [Range(0, 1)] public float m_WindFriction;
+    [HideInInspector] public WindPrecission m_WindSolverPrecission;
 
-    [HideInInspector] public bool m_FixingByTexture;
     [HideInInspector] public Texture2D m_Texture;
     [HideInInspector] public List<GameObject> m_Fixers;
 
-    [HideInInspector] public bool m_CanCollide;
     [HideInInspector] public List<GameObject> m_CollidingObjects;
-    [HideInInspector] public PenaltyPrecission m_PenaltyForcePrecission;
 
     #endregion
 
@@ -73,17 +88,17 @@ public class ClothBehaviour : MonoBehaviour
         m_TimeStep = 0.004f;
         m_Substeps = 5;
 
-        m_Gravity = new Vector3(0.0f, -9.81f, 0.0f);
+        m_Gravity.value = new Vector3(0.0f, -9.81f, 0.0f);
 
         m_Paused = true;
 
-        m_TractionStiffness = 20f;
-        m_FlexionStiffness = 15f;
+        m_TractionStiffness.value = 20f;
+        m_FlexionStiffness.value = 15f;
 
-        m_NodeMass = 0.03f;
+        m_NodeMass.value = 0.03f;
 
-        m_NodeDamping = 0.3f;
-        m_SpringDamping = 0.3f;
+        m_NodeDamping.value = 0.3f;
+        m_SpringDamping.value = 0.3f;
 
         m_SolvingMethod = Solver.Symplectic;
 
@@ -93,22 +108,50 @@ public class ClothBehaviour : MonoBehaviour
 
         m_AffectedByWind = false;
         m_WindFriction = 0.5f;
+        m_WindSolverPrecission = WindPrecission.High;
 
         m_CanCollide = false;
-        m_PenaltyForcePrecission = PenaltyPrecission.High;
     }
+
+    #region Initialization Setups
+    [ContextMenu("Low Res Mesh Setup")]
+    private void LowResSetup()
+    {
+        m_TimeStep = 0.02f; m_Paused = true;
+        m_TractionStiffness.value = 20f; m_FlexionStiffness.value = 15f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
+        m_SolvingMethod = Solver.Symplectic;
+        m_WindSolverPrecission = WindPrecission.High;
+    }   
+    [ContextMenu("Medium Res Mesh Setup")]
+    private void MedResSetup()
+    {
+        m_TimeStep = 0.01f; m_Substeps = 2; m_Paused = true;
+        m_TractionStiffness.value = 50f; m_FlexionStiffness.value = 30f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
+        m_SolvingMethod = Solver.Symplectic;
+        m_WindSolverPrecission = WindPrecission.Medium;
+    }
+    [ContextMenu("High Res Mesh Setup")]
+    private void HighResSetup()
+    {
+        m_TimeStep = 0.007f; m_Substeps = 1; m_Paused = true;
+        m_TractionStiffness.value = 100f; m_FlexionStiffness.value = 80f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
+        m_SolvingMethod = Solver.Symplectic;
+        m_WindSolverPrecission = WindPrecission.Low;
+    }
+    #endregion
 
     public enum Solver
     {
         Explicit = 0,
         Symplectic = 1,
         Midpoint = 2,
+        Implicit = 3,
     };
-    public enum PenaltyPrecission
+    public enum WindPrecission
     {
-        Low = 4,
-        Medium = 2,
         High = 1,
+        Medium = 2,
+        Low = 3,
     }
 
 
@@ -124,10 +167,13 @@ public class ClothBehaviour : MonoBehaviour
 
         m_Nodes = new List<Node>();
 
+
+
         for (int i = 0; i < m_Mesh.vertexCount; i++)
         {
             //For simulation purposes, transform the points to global coordinates
-            m_Nodes.Add(new Node(i, transform.TransformPoint(m_Vertices[i]), this, m_NodeDamping, m_NodeMass, vertex_UVs[i]));
+
+            m_Nodes.Add(new Node(i, transform.TransformPoint(m_Vertices[i]), m_NodeMass, m_NodeDamping, m_Gravity, vertex_UVs[i]));
         }
 
 
@@ -139,6 +185,7 @@ public class ClothBehaviour : MonoBehaviour
 
         for (int i = 0; i < m_Mesh.triangles.Length; i += 3)
         {
+
             List<Edge> edges = new List<Edge>();
             edges.Add(new Edge(m_Triangles[i], m_Triangles[i + 1], m_Triangles[i + 2]));
             edges.Add(new Edge(m_Triangles[i + 1], m_Triangles[i + 2], m_Triangles[i]));
@@ -151,83 +198,22 @@ public class ClothBehaviour : MonoBehaviour
                     //La arista está en el diccionario
                     otherEdge.m_A = otherEdge.m_O;
                     otherEdge.m_B = edge.m_O;
+
                     //edgeDictionary.Add(otherEdge, otherEdge);
-                    m_Springs.Add(new Spring(m_Nodes[otherEdge.m_A], m_Nodes[otherEdge.m_B], this, m_FlexionStiffness, m_SpringDamping));
+                    m_Springs.Add(new Spring(m_Nodes[otherEdge.m_A], m_Nodes[otherEdge.m_B], m_FlexionStiffness, m_SpringDamping));
 
                 }
                 else
                 {
+
                     //La arista no está en el diccionario
+                    m_Springs.Add(new Spring(m_Nodes[edge.m_A], m_Nodes[edge.m_B], m_TractionStiffness, m_SpringDamping));
                     edgeDictionary.Add(edge, edge);
-                    m_Springs.Add(new Spring(m_Nodes[edge.m_A], m_Nodes[edge.m_B], this, m_TractionStiffness, m_SpringDamping));
                 }
             }
         }
-        ////
-        //string edg = "";
-        //for (int i = 0; i < m_Springs.Count; i++)
-        //{
-        //    edg += m_Springs[i].m_NodeA.m_Id + "" + m_Springs[i].m_NodeB.m_Id + "   ";
-        //}
-        //Debug.Log(edg);
-        ////
 
-        //List<Edge> edges = new List<Edge>();
-
-        //for (int i = 0; i < m_Mesh.triangles.Length; i += 3)
-        //{
-        //    edges.Add(new Edge(m_Triangles[i], m_Triangles[i + 1], m_Triangles[i + 2]));
-        //    edges.Add(new Edge(m_Triangles[i + 1], m_Triangles[i + 2], m_Triangles[i]));
-        //    edges.Add(new Edge(m_Triangles[i], m_Triangles[i + 2], m_Triangles[i + 1]));
-
-        //}
-        ////
-        //string edg = "";
-        //for (int i = 0; i < edges.Count; i++)
-        //{
-        //    edg += edges[i].m_A + "" + edges[i].m_B + "" + edges[i].m_O + "   ";
-        //}
-        //Debug.Log(edg);
-        ////
-        //EdgeComparer edgeComparer = new EdgeComparer();
-
-        //edges.Sort(edgeComparer);
-        ////
-        //edg = "";
-        //for (int i = 0; i < edges.Count; i++)
-        //{
-        //    edg += edges[i].m_A + "" + edges[i].m_B + "" + edges[i].m_O + "   ";
-        //}
-        //Debug.Log(edg);
-        ////
-        //m_Springs.Add(new Spring(m_Nodes[edges[0].m_A], m_Nodes[edges[0].m_B], this, m_TractionStiffness));
-
-        //for (int i = 1; i < m_Mesh.triangles.Length; i++)
-        //{
-        //    if (edges[i].m_A == edges[i - 1].m_A && edges[i].m_B == edges[i - 1].m_B || edges[i].m_A == edges[i - 1].m_A && edges[i].m_B == edges[i - 1].m_B)
-        //    {
-        //        //Flexion
-        //        edges[i].m_A = edges[i].m_O;
-        //        edges[i].m_B = edges[i - 1].m_O;
-        //        m_Springs.Add(new Spring(m_Nodes[edges[i].m_A], m_Nodes[edges[i].m_B], this, m_FlexionStiffness));
-
-        //    }
-        //    else
-        //    {
-        //        //Tracción
-        //        m_Springs.Add(new Spring(m_Nodes[edges[i].m_A], m_Nodes[edges[i].m_B], this, m_TractionStiffness));
-        //    }
-        //}
-        ////
-        //edg = "";
-        //for (int i = 0; i < edges.Count; i++)
-        //{
-        //    edg += edges[i].m_A + "" + edges[i].m_B + "" + edges[i].m_O + "   ";
-        //}
-        //Debug.Log(edg);
-        ////
-
-        m_TimeStep = m_TimeStep / m_Substeps;
+        m_SubTimeStep = m_TimeStep / m_Substeps;
 
         //Attach to fixers
         if (m_FixingByTexture)
@@ -237,21 +223,21 @@ public class ClothBehaviour : MonoBehaviour
 
         //Look for Wind objs
         CheckWindObjects();
-
     }
-
-
 
     public void Update()
     {
         if (Input.GetKeyUp(KeyCode.P))
             this.m_Paused = !this.m_Paused;
 
+        m_SubTimeStep = m_TimeStep / m_Substeps;
 
         CheckWindObjects();
+        if (m_AffectedByWind && m_WindSolverPrecission == WindPrecission.Low)
+        {
+            ComputeWindForces();
+        }
 
-
-        //ACTUALIZAR POSICION DE NODOS CUANDO SE MUEVEN
         foreach (var node in m_FixedNodes)
         {
             if (m_FixingByTexture)
@@ -276,25 +262,32 @@ public class ClothBehaviour : MonoBehaviour
 
     public void FixedUpdate()
     {
-        if (this.m_Paused)
+        if (m_Paused)
             return; // Not simulating
 
-        if (m_AffectedByWind)
+        if (m_AffectedByWind && m_WindSolverPrecission == WindPrecission.Medium)
         {
             ComputeWindForces();
         }
+
         // Select integration method
         for (int i = 0; i < m_Substeps; i++)
         {
+            if (m_AffectedByWind && m_WindSolverPrecission == WindPrecission.High)
+            {
+                ComputeWindForces();
+            }
 
-            switch (this.m_SolvingMethod)
+            switch (m_SolvingMethod)
             {
 
-                case Solver.Explicit: this.stepExplicit(); break;
+                case Solver.Explicit: stepExplicit(); break;
 
-                case Solver.Symplectic: this.stepSymplectic(); break;
+                case Solver.Symplectic: stepSymplectic(); break;
 
-                case Solver.Midpoint: this.stepRK2(); break;
+                case Solver.Midpoint: stepRK2(); break;
+
+                //case Solver.Implicit: stepImplicit(); break;
 
                 default:
                     throw new System.Exception("[ERROR] Should never happen!");
@@ -314,7 +307,8 @@ public class ClothBehaviour : MonoBehaviour
         foreach (var n in m_Nodes)
         {
             n.m_Force = Vector3.zero;
-
+            //if (m_CanCollide && m_CollidingObjects.Count != 0) n.ComputePenaltyForce();
+            if (!m_AffectedByWind) n.m_WindForce = Vector3.zero;
             n.ComputeForces();
         }
 
@@ -327,14 +321,14 @@ public class ClothBehaviour : MonoBehaviour
         {
             if (!n.m_Fixed)
             {
-                n.m_Pos += m_TimeStep * n.m_Vel;
-                n.m_Vel += m_TimeStep / n.m_Mass * n.m_Force;
+                n.m_Pos += m_SubTimeStep * n.m_Vel;
+                n.m_Vel += m_SubTimeStep / n.m_Mass.value * n.m_Force;
             }
         }
 
     }
     /// <summary>
-    /// Better solver. Either not perfect
+    /// Better solver. Either not perfect. Recommended.
     /// </summary>
     private void stepSymplectic()
     {
@@ -342,6 +336,7 @@ public class ClothBehaviour : MonoBehaviour
         foreach (var n in m_Nodes)
         {
             n.m_Force = Vector3.zero;
+            if (!m_AffectedByWind) n.m_WindForce = Vector3.zero;
             n.ComputeForces();
         }
 
@@ -354,14 +349,62 @@ public class ClothBehaviour : MonoBehaviour
         {
             if (!n.m_Fixed)
             {
-                n.m_Vel += m_TimeStep / n.m_Mass * n.m_Force;
-                n.m_Pos += m_TimeStep * n.m_Vel;
+                Vector3 vel = n.m_Vel + m_SubTimeStep / n.m_Mass.value * n.m_Force;
+
+                if (m_CanCollide)
+                {
+                    foreach (var obj in m_CollidingObjects)
+                    {
+
+                        Collider collider = obj.GetComponent<Collider>();
+                        if (collider.bounds.Contains(n.m_Pos))
+                        {
+                            MatrixXD df_dx = n.ComputePenaltyDifferential(collider);
+
+                            //Vector3 closest = collider.ClosestPoint(n.m_Pos);
+                            //Vector3 u = closest - n.m_Pos;
+                            //Vector3 oX = u;
+                            //float deepness = u.magnitude;
+                            //u.Normalize();
+                            //MatrixXD oxp= new DenseMatrixXD(1, 3);
+                            //oxp[0, 0] = oX[0];
+                            //oxp[0, 1] = oX[1];
+                            //oxp[0, 2] = oX[2];
+                            //oxp.Transpose();
+                            
+
+                            //VectorXD penaltyForce = -50f * deepness * u;
+
+                            MatrixXD i = new DenseMatrixXD(3);
+                            i = DenseMatrixXD.CreateIdentity(3);
+
+                            VectorXD velProxy = new DenseVectorXD(3);
+                            velProxy[0] = vel[0]; velProxy[1] = vel[1]; velProxy[2] = vel[2];
+                            //MatrixXD velProxy = new DenseMatrixXD(1, 3);
+                            //velProxy[0, 0] = vel[0];
+                            //velProxy[0, 1] = vel[1];
+                            //velProxy[0, 2] = vel[2];
+
+                            //VectorXD resultProxy = (i - ((m_SubTimeStep * m_SubTimeStep) / n.m_Mass.value) * df_dx);
+
+                            var resultProxy = (i - ((m_SubTimeStep * m_SubTimeStep) / n.m_Mass.value) * df_dx*-1f).Solve(velProxy);
+
+                            vel = new Vector3((float)resultProxy[0], (float)resultProxy[1], (float)resultProxy[2]);
+                            Debug.Log(vel);
+                            break;
+
+                        }
+                    }
+                }
+
+                n.m_Vel = vel;
+                n.m_Pos += m_SubTimeStep * n.m_Vel;
             }
         }
 
     }
     /// <summary>
-    /// Fairly good solver
+    /// Fairly good solver. Also known as midpoint.
     /// </summary>
     private void stepRK2()
     {
@@ -378,7 +421,8 @@ public class ClothBehaviour : MonoBehaviour
 
             m_Nodes[i].m_Force = Vector3.zero;
 
-
+            //if (m_CanCollide && m_CollidingObjects.Count != 0) m_Nodes[i].ComputePenaltyForce();
+            if (!m_AffectedByWind) m_Nodes[i].m_WindForce = Vector3.zero;
             m_Nodes[i].ComputeForces();
         }
 
@@ -391,8 +435,8 @@ public class ClothBehaviour : MonoBehaviour
         {
             if (!n.m_Fixed)
             {
-                n.m_Vel += (m_TimeStep * 0.5f) / n.m_Mass * n.m_Force;
-                n.m_Pos += (m_TimeStep * 0.5f) * n.m_Vel;
+                n.m_Vel += (m_SubTimeStep * 0.5f) / n.m_Mass.value * n.m_Force;
+                n.m_Pos += (m_SubTimeStep * 0.5f) * n.m_Vel;
             }
         }
 
@@ -401,6 +445,7 @@ public class ClothBehaviour : MonoBehaviour
         {
             n.m_Force = Vector3.zero;
 
+            //if (m_CanCollide && m_CollidingObjects.Count != 0) n.ComputePenaltyForce();
             n.ComputeForces();
         }
 
@@ -414,13 +459,14 @@ public class ClothBehaviour : MonoBehaviour
 
             if (!m_Nodes[i].m_Fixed)
             {
-                m_Nodes[i].m_Vel = m_Vel0[i] + m_TimeStep / m_Nodes[i].m_Mass * m_Nodes[i].m_Force;
-                m_Nodes[i].m_Pos = m_Pos0[i] + m_TimeStep * m_Nodes[i].m_Vel;
+                m_Nodes[i].m_Vel = m_Vel0[i] + m_SubTimeStep / m_Nodes[i].m_Mass.value * m_Nodes[i].m_Force;
+                m_Nodes[i].m_Pos = m_Pos0[i] + m_SubTimeStep * m_Nodes[i].m_Vel;
             }
         }
 
 
     }
+
     #endregion
     /// <summary>
     /// Checks whether the vertex is inside the fixers colliders in order to put it in fixer state
@@ -443,7 +489,7 @@ public class ClothBehaviour : MonoBehaviour
                     m_FixedNodes.Add(node);
 
                 }
-
+                #region OwnCollisionAlgorithms
                 //PROGRAMMED COLLISION ALGORITHMS
 
                 //Vector3 f_center = collider.bounds.center;
@@ -489,18 +535,14 @@ public class ClothBehaviour : MonoBehaviour
                 //        }
 
                 //    }
-
-
+                #endregion
             }
-
         }
     }
     private void CheckTextureWeights()
     {
 
-        Vector2[] uvs = m_Mesh.uv;
         int textWidth = m_Texture.width;
-
 
         foreach (var node in m_Nodes)
         {
@@ -521,10 +563,7 @@ public class ClothBehaviour : MonoBehaviour
                 node.m_ForceFactor = 1 - color.a;
             }
         }
-        //foreach (var item in m_FixedNodes) 
-        //{
-        //    Debug.Log(item);
-        //}
+
     }
     /// <summary>
     /// Automatically called on start. Checks for wind objects in order to take them into account to make the wind simulation
@@ -546,21 +585,22 @@ public class ClothBehaviour : MonoBehaviour
             int total = m_WindObjs.Length;
             foreach (var obj in m_WindObjs)
             {
-                Vector3 windVel = obj.transform.forward * (obj.windMain + (obj.windPulseMagnitude * obj.windMain * Mathf.Abs(Mathf.Sin(Time.time * (obj.windPulseFrequency * 10))))); //tweaked
-                m_AverageWindVelocity += windVel;
+                if (obj.gameObject.activeSelf)
+                {
+                    Vector3 windVel = obj.transform.forward * (obj.windMain + (obj.windPulseMagnitude * obj.windMain * Mathf.Abs(Mathf.Sin(Time.time * (obj.windPulseFrequency * 10))))); //tweaked
+                    m_AverageWindVelocity += windVel;
+                }
 
             }
-            m_AverageWindVelocity = new Vector3(m_AverageWindVelocity.x / total, m_AverageWindVelocity.y / total, m_AverageWindVelocity.z / total);
+            if (m_AverageWindVelocity.magnitude > 0)
+                m_AverageWindVelocity = new Vector3(m_AverageWindVelocity.x / total, m_AverageWindVelocity.y / total, m_AverageWindVelocity.z / total);
         }
-
-
     }
     /// <summary>
     /// Called every step update in the fixed update. Computes the applied wind force of every triangle in the mesh. 
     /// </summary>
     private void ComputeWindForces()
     {
-
         for (int i = 0; i < m_Mesh.triangles.Length; i += 3)
         {
 
@@ -568,31 +608,22 @@ public class ClothBehaviour : MonoBehaviour
             Node nodeB = m_Nodes[m_Triangles[i + 1]];
             Node nodeC = m_Nodes[m_Triangles[i + 2]];
 
-            //Area triangulo FORMULA DE HERON
-            float sideA = (nodeA.m_Pos - nodeB.m_Pos).magnitude;
-            float sideB = (nodeB.m_Pos - nodeC.m_Pos).magnitude;
-            float sideC = (nodeC.m_Pos - nodeA.m_Pos).magnitude;
-            float semiPerimeter = (sideA + sideB + sideC) / 2;
+            Vector3 crossProduct = Vector3.Cross(nodeA.m_Pos - nodeB.m_Pos, nodeB.m_Pos - nodeC.m_Pos);
 
-            float trisArea = Mathf.Sqrt(semiPerimeter * (semiPerimeter - sideA) * (semiPerimeter - sideB) * (semiPerimeter - sideC));
+            float trisArea = crossProduct.magnitude / 2;
 
-            Vector3 trisNormal = Vector3.Cross(nodeA.m_Pos - nodeB.m_Pos, nodeB.m_Pos - nodeC.m_Pos).normalized;
+            Vector3 trisNormal = crossProduct.normalized;
 
-
-            //Velocidad triangulo MEDIA DE LAS VELOCIDADES DE LOS NODES
             Vector3 trisSpeed = new Vector3((nodeA.m_Vel.x + nodeB.m_Vel.x + nodeC.m_Vel.x) / 3, (nodeA.m_Vel.y + nodeB.m_Vel.y + nodeC.m_Vel.y) / 3, (nodeA.m_Vel.z + nodeB.m_Vel.z + nodeC.m_Vel.z) / 3);
 
             Vector3 trisWindForce = m_WindFriction * trisArea * Vector3.Dot(trisNormal, m_AverageWindVelocity - trisSpeed) * trisNormal;
             Vector3 dispersedForce = trisWindForce / 3;
 
-            //Dotar a los nodos de la fuerza dispersada entre 3
             nodeA.m_WindForce = dispersedForce;
             nodeB.m_WindForce = dispersedForce;
             nodeC.m_WindForce = dispersedForce;
         }
     }
-
-
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -606,6 +637,7 @@ public class ClothBehaviour : MonoBehaviour
 /// Class representing each vertex physical attributes necessary
 /// to compute the cloth physics
 /// </summary>
+
 public class Node
 {
     public bool m_Fixed;
@@ -615,12 +647,12 @@ public class Node
     public Vector3 m_Vel;
     public Vector3 m_Force;
     public float m_ForceFactor;
-    public float m_Mass;
-    public float m_DampingA;
+    public Ref<float> m_Mass;
+    public Ref<float> m_DampingA;
+    public Ref<Vector3> m_Gravity;
 
     public Vector3 m_offset;            //Only if fixed enabled
 
-    public ClothBehaviour m_Manager;
     public GameObject m_Fixer;          //Only if fixed enabled
 
     public Vector3 m_WindForce;         //Only if wind enabled
@@ -629,78 +661,78 @@ public class Node
     public Vector2 m_UV;
 
 
-    public Node(int iD, Vector3 pos, ClothBehaviour manager, float dampA, float mass, Vector2 uv)
+    public Node(int iD, Vector3 pos, Ref<float> mass, Ref<float> damping, Ref<Vector3> grav, Vector2 uv)
     {
         m_Fixed = false;
-
         m_Id = iD;
         m_Pos = pos;
-        m_DampingA = dampA;
         m_Vel = Vector3.zero;
-        m_Manager = manager;
-        m_Mass = mass;
-
-        m_Fixer = null;
-
         m_UV = uv;
-
         m_ForceFactor = 1f;
-
-        //m_offset = manager.transform.InverseTransformPoint(m_Pos);
-
-    }
-    public void UpdateVariables(float dampA, float dampB, float mass)
-    {
-        m_DampingA = dampA;
+        m_Fixer = null;
+        m_DampingA = damping;
         m_Mass = mass;
-
-
+        m_Gravity = grav;
     }
+
     /// <summary>
-    /// Computes the resultant force of the node without taking in count the spring force
+    /// Computes the resultant force of the node without taking in count the spring contraction force
     /// </summary>
     /// 
     public void ComputeForces()
     {
 
-        if (!m_Manager.m_AffectedByWind) m_WindForce = Vector3.zero;
-        if (m_Manager.m_CanCollide) ComputePenaltyForce();
-
-        m_Force += m_Mass * m_Manager.m_Gravity - m_DampingA * m_Mass * m_Vel + m_WindForce + m_PenaltyForce;
+        m_Force += m_Mass.value * m_Gravity.value - m_DampingA.value * m_Mass.value * m_Vel + m_WindForce;
 
         m_Force *= m_ForceFactor;
 
-        m_PenaltyForce = Vector3.zero;
+        //m_PenaltyForce = Vector3.zero;
 
     }
-    private void ComputePenaltyForce()
+    public MatrixXD ComputePenaltyDifferential(Collider collider)
     {
-        float k = 1000f;
-        if (m_Manager.m_CollidingObjects.Count == 0) { return; }
+        float k = 50f;
 
-        foreach (var obj in m_Manager.m_CollidingObjects)
-        {
-            
-            Collider collider = obj.GetComponent<Collider>();
-            if (collider.bounds.Contains(m_Pos))
-            {
-                Vector3 closest = collider.ClosestPoint(m_Pos);
-                Vector3 u = closest - m_Pos;
-                float deepness = u.magnitude;
-                u.Normalize();
+        Vector3 closest = collider.ClosestPoint(m_Pos);
+        Vector3 u = closest - m_Pos;
+        Vector3 oX = u;
+        //float deepness = u.magnitude;
+        u.Normalize();
 
-                Vector3 penaltyForce = -k * deepness * u;
-                //Debug.Log("Force"+penaltyForce);
+        //Vector3 penaltyForce = -k * deepness * u;
+        //m_PenaltyForce = penaltyForce;
+        //Debug.Log("Force"+penaltyForce);
+        MatrixXD normal = new DenseMatrixXD(1, 3);
+        normal[0, 0] = u[0];
+        normal[0, 1] = u[1];
+        normal[0, 2] = u[2];
+        //MatrixXD oXProxy = new DenseMatrixXD(1, 3);
+        //oXProxy[0, 0] = oX[0];
+        //oXProxy[0, 1] = oX[1];
+        //oXProxy[0, 2] = oX[2];
 
-                m_PenaltyForce = penaltyForce;
-            }
+        var normalT = normal.Transpose();
 
+        var normalMatrix = normalT * normal;
+        //normalMatrix *= -k;
 
-        }
+        return normalMatrix;
+
+        //VectorXD oXproxy = new DenseVectorXD(3);
+        //oXproxy[0] = oX[0];
+        //oXproxy[1] = oX[1];
+        //oXproxy[2] = oX[2];
+        //var X = normalMatrix.Solve(oXproxy);
+        //X *= -k;
+
+        //Vector3 res = new Vector3((float)X[0], (float)X[1], (float)X[2]);
+
+        //m_PenaltyForce = res;
+        //Debug.Log(res);
+        //Debug.Break();
 
     }
 }
-
 /// <summary>
 /// Class representing each edge interacting with nodes and aplying compression and traction forces
 /// </summary>
@@ -711,13 +743,12 @@ public class Spring
 
     public float m_Length0;
     public float m_Length;
-    public float m_Stiffness;
-    public float m_Damping;
+    public Ref<float> m_Stiffness;
+    public Ref<float> m_Damping;
 
 
-    public ClothBehaviour m_Manager;
 
-    public Spring(Node nodeA, Node nodeB, ClothBehaviour manager, float stiff, float damping)
+    public Spring(Node nodeA, Node nodeB, Ref<float> stiff, Ref<float> damping)
     {
         m_NodeA = nodeA;
         m_NodeB = nodeB;
@@ -725,11 +756,6 @@ public class Spring
         m_Length = m_Length0;
         m_Stiffness = stiff; //boin oi oi oi oing
         m_Damping = damping;
-        m_Manager = manager;
-    }
-    public void UpdateVariables(float stiff)
-    {
-        m_Stiffness = stiff;
     }
 
     /// <summary>
@@ -742,15 +768,15 @@ public class Spring
         m_Length = u.magnitude;
         u.Normalize();
 
-        float dampForce = -m_Damping * Vector3.Dot(u, (m_NodeA.m_Vel - m_NodeB.m_Vel));
-        float stress = -m_Stiffness * (m_Length - m_Length0) + dampForce;
+        float dampForce = -m_Damping.value * Vector3.Dot(u, (m_NodeA.m_Vel - m_NodeB.m_Vel));
+        float stress = -m_Stiffness.value * (m_Length - m_Length0) + dampForce;
         Vector3 force = stress * u;
         m_NodeA.m_Force += force;
         m_NodeB.m_Force -= force;
 
 
     }
-   
+
 }
 public class Edge
 {
@@ -773,18 +799,6 @@ public class Edge
     }
 }
 
-//public class EdgeComparer : IComparer<Edge>
-//{
-//    public int Compare(Edge a, Edge b)
-//    {
-//        if (a.m_A < b.m_A) return -1;
-//        else if (b.m_A < a.m_A) return 1;
-//        else if (a.m_B < b.m_B) return -1;
-//        else if (b.m_B < a.m_B) return 1;
-//        else return 0;
-//    }
-//}
-
 public class EdgeQualityComparer : IEqualityComparer<Edge>
 {
     public bool Equals(Edge a, Edge b)
@@ -795,9 +809,15 @@ public class EdgeQualityComparer : IEqualityComparer<Edge>
 
     public int GetHashCode(Edge e)
     {
-        int hcode = e.m_A * e.m_B + e.m_A + e.m_B;
-        hcode += (e.m_A % 2 == 0 ? 31 : 0);
-        hcode += (e.m_B % 2 == 0 ? 0 : 17);
+        List<int> pts = new List<int>(); pts.Add(e.m_A); pts.Add(e.m_B);
+        pts.Sort();
+        //CANTOR PAIRING FUNCTION
+        int hcode = ((pts[0] + pts[1]) * (pts[0] + pts[1] + 1)) / 2 + pts[1];
+
         return hcode.GetHashCode();
     }
+}
+public class Ref<T>
+{
+    public T value { get; set; }
 }
