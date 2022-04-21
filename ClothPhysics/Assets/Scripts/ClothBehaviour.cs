@@ -8,6 +8,13 @@ using DenseVectorXD = MathNet.Numerics.LinearAlgebra.Double.DenseVector;
 using DenseMatrixXD = MathNet.Numerics.LinearAlgebra.Double.DenseMatrix;
 
 
+///<author>
+///Antonio Espinosa García
+///2022
+///
+
+
+
 /// <summary>
 /// Cloth physics manager. Add this to a Scene Object with a mesh and let it flow with the wind
 /// </summary>
@@ -77,8 +84,10 @@ public class ClothBehaviour : MonoBehaviour
     [HideInInspector] public Texture2D m_Texture;
     [HideInInspector] public List<GameObject> m_Fixers;
 
-    [HideInInspector] public List<GameObject> m_CollidingObjects;
+    [HideInInspector] public List<GameObject> m_CollidingSpheres;
+    [HideInInspector] public List<GameObject> m_CollidingPlanes;
 
+    [HideInInspector] public float m_PenaltyDamping;
     #endregion
 
     public ClothBehaviour()
@@ -111,6 +120,20 @@ public class ClothBehaviour : MonoBehaviour
         m_WindSolverPrecission = WindPrecission.High;
 
         m_CanCollide = false;
+        m_PenaltyDamping = 10f;
+    }
+    public enum Solver
+    {
+        Explicit = 0,
+        Symplectic = 1,
+        Midpoint = 2,
+        ImplicitCollisions = 3,
+    };
+    public enum WindPrecission
+    {
+        High = 1,
+        Medium = 2,
+        Low = 3,
     }
 
     #region Initialization Setups
@@ -121,7 +144,7 @@ public class ClothBehaviour : MonoBehaviour
         m_TractionStiffness.value = 20f; m_FlexionStiffness.value = 15f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
         m_SolvingMethod = Solver.Symplectic;
         m_WindSolverPrecission = WindPrecission.High;
-    }   
+    }
     [ContextMenu("Medium Res Mesh Setup")]
     private void MedResSetup()
     {
@@ -139,21 +162,6 @@ public class ClothBehaviour : MonoBehaviour
         m_WindSolverPrecission = WindPrecission.Low;
     }
     #endregion
-
-    public enum Solver
-    {
-        Explicit = 0,
-        Symplectic = 1,
-        Midpoint = 2,
-        Implicit = 3,
-    };
-    public enum WindPrecission
-    {
-        High = 1,
-        Medium = 2,
-        Low = 3,
-    }
-
 
     #region MonoBehaviour
 
@@ -198,8 +206,6 @@ public class ClothBehaviour : MonoBehaviour
                     //La arista está en el diccionario
                     otherEdge.m_A = otherEdge.m_O;
                     otherEdge.m_B = edge.m_O;
-
-                    //edgeDictionary.Add(otherEdge, otherEdge);
                     m_Springs.Add(new Spring(m_Nodes[otherEdge.m_A], m_Nodes[otherEdge.m_B], m_FlexionStiffness, m_SpringDamping));
 
                 }
@@ -281,13 +287,13 @@ public class ClothBehaviour : MonoBehaviour
             switch (m_SolvingMethod)
             {
 
-                case Solver.Explicit: stepExplicit(); break;
+                case Solver.Explicit: StepExplicit(); break;
 
-                case Solver.Symplectic: stepSymplectic(); break;
+                case Solver.Symplectic: StepSymplectic(); break;
 
-                case Solver.Midpoint: stepRK2(); break;
+                case Solver.Midpoint: StepRK2(); break;
 
-                //case Solver.Implicit: stepImplicit(); break;
+                case Solver.ImplicitCollisions: StepSemiImplicit(); break;
 
                 default:
                     throw new System.Exception("[ERROR] Should never happen!");
@@ -302,7 +308,7 @@ public class ClothBehaviour : MonoBehaviour
     /// <summary>
     /// Worst solver. Good for simple assets or arcade physics
     /// </summary>
-    private void stepExplicit()
+    private void StepExplicit()
     {
         foreach (var n in m_Nodes)
         {
@@ -330,7 +336,7 @@ public class ClothBehaviour : MonoBehaviour
     /// <summary>
     /// Better solver. Either not perfect. Recommended.
     /// </summary>
-    private void stepSymplectic()
+    private void StepSymplectic()
     {
 
         foreach (var n in m_Nodes)
@@ -350,63 +356,30 @@ public class ClothBehaviour : MonoBehaviour
             if (!n.m_Fixed)
             {
                 Vector3 vel = n.m_Vel + m_SubTimeStep / n.m_Mass.value * n.m_Force;
-
                 if (m_CanCollide)
                 {
-                    foreach (var obj in m_CollidingObjects)
+                    foreach (var obj in m_CollidingSpheres)
                     {
-
-                        Collider collider = obj.GetComponent<Collider>();
-                        if (collider.bounds.Contains(n.m_Pos))
+                        if (n.isColliding(obj) == 1)
                         {
-                            MatrixXD df_dx = n.ComputePenaltyDifferential(collider);
-
-                            //Vector3 closest = collider.ClosestPoint(n.m_Pos);
-                            //Vector3 u = closest - n.m_Pos;
-                            //Vector3 oX = u;
-                            //float deepness = u.magnitude;
-                            //u.Normalize();
-                            //MatrixXD oxp= new DenseMatrixXD(1, 3);
-                            //oxp[0, 0] = oX[0];
-                            //oxp[0, 1] = oX[1];
-                            //oxp[0, 2] = oX[2];
-                            //oxp.Transpose();
-                            
-
-                            //VectorXD penaltyForce = -50f * deepness * u;
-
-                            MatrixXD i = new DenseMatrixXD(3);
-                            i = DenseMatrixXD.CreateIdentity(3);
-
-                            VectorXD velProxy = new DenseVectorXD(3);
-                            velProxy[0] = vel[0]; velProxy[1] = vel[1]; velProxy[2] = vel[2];
-                            //MatrixXD velProxy = new DenseMatrixXD(1, 3);
-                            //velProxy[0, 0] = vel[0];
-                            //velProxy[0, 1] = vel[1];
-                            //velProxy[0, 2] = vel[2];
-
-                            //VectorXD resultProxy = (i - ((m_SubTimeStep * m_SubTimeStep) / n.m_Mass.value) * df_dx);
-
-                            var resultProxy = (i - ((m_SubTimeStep * m_SubTimeStep) / n.m_Mass.value) * df_dx*-1f).Solve(velProxy);
-
-                            vel = new Vector3((float)resultProxy[0], (float)resultProxy[1], (float)resultProxy[2]);
-                            Debug.Log(vel);
-                            break;
-
+                            n.ComputeExplicitPenaltyForce(n.ComputeSphereCollision(obj), m_PenaltyDamping);
+                            n.m_Force += n.m_PenaltyForce;
+                            vel = n.m_Vel + m_SubTimeStep / n.m_Mass.value * n.m_Force;
                         }
+
                     }
                 }
-
                 n.m_Vel = vel;
                 n.m_Pos += m_SubTimeStep * n.m_Vel;
             }
-        }
 
+        }
     }
+
     /// <summary>
     /// Fairly good solver. Also known as midpoint.
     /// </summary>
-    private void stepRK2()
+    private void StepRK2()
     {
         Vector3[] m_Vel0 = new Vector3[m_Nodes.Count];
         Vector3[] m_Pos0 = new Vector3[m_Nodes.Count];
@@ -466,10 +439,80 @@ public class ClothBehaviour : MonoBehaviour
 
 
     }
+    private void StepSemiImplicit()
+    {
+        foreach (var n in m_Nodes)
+        {
+            n.m_Force = Vector3.zero;
+            if (!m_AffectedByWind) n.m_WindForce = Vector3.zero;
+            n.ComputeForces();
+        }
+
+        foreach (var s in m_Springs)
+        {
+            s.ComputeForces();
+        }
+
+        Vector3 penaltyVel = Vector3.zero;
+        Vector3 standardVel = Vector3.zero;
+        foreach (var n in m_Nodes)
+        {
+            if (!n.m_Fixed)
+            {
+                Vector3 vel = n.m_Vel + m_SubTimeStep / n.m_Mass.value * n.m_Force;
+                penaltyVel = Vector3.zero;
+                standardVel = vel;
+                if (m_CanCollide)
+                {
+                    foreach (var obj in m_CollidingSpheres)
+                    {
+                        if (n.isColliding(obj) == 1)
+                        {
+
+                            MatrixXD diff = n.ComputeImplicitPenaltyForce(n.ComputeSphereCollision(obj), m_PenaltyDamping);
+                            Debug.Log("Diff " + diff);
+
+                            MatrixXD i = new DenseMatrixXD(3);
+                            i = DenseMatrixXD.CreateIdentity(3);
+
+                            VectorXD standardVelProxy = new DenseVectorXD(3);
+                            standardVelProxy[0] = vel.x; standardVelProxy[1] = vel.y; standardVelProxy[2] = vel.z;
+
+
+                            Vector3 penaltiVel0 = n.m_Vel + m_SubTimeStep / n.m_Mass.value * n.m_PenaltyForce;
+
+                            VectorXD penaltyVelProxy = new DenseVectorXD(3);
+                            penaltyVelProxy[0] = penaltiVel0.x; penaltyVelProxy[1] = penaltiVel0.y; penaltyVelProxy[2] = penaltiVel0.z;
+                            Debug.Log("PenaltyVel 000" + penaltyVelProxy);
+                            Debug.Log("standardVel 0000" + standardVelProxy);
+
+                            var resultPenaltyVel = (i - (m_SubTimeStep * m_SubTimeStep / n.m_Mass.value) * diff).Solve(penaltyVelProxy);
+                            Debug.Log("PenaltyVel " + resultPenaltyVel);
+                            var resultStandardVel = (i).Solve(standardVelProxy);
+                            Debug.Log("standardVel " + resultStandardVel);
+
+                            penaltyVel = new Vector3((float)resultPenaltyVel[0], (float)resultPenaltyVel[1], (float)resultPenaltyVel[2]);
+                            standardVel = new Vector3((float)resultStandardVel[0], (float)resultStandardVel[1], (float)resultStandardVel[2]);
+                            //Debug.Break();
+                            //Debug.Break();
+                            break;
+
+                        }
+                    }
+
+                }
+
+                n.m_Vel = standardVel + penaltyVel;
+                n.m_Pos += m_SubTimeStep * n.m_Vel;
+            }
+
+        }
+    }
+
 
     #endregion
     /// <summary>
-    /// Checks whether the vertex is inside the fixers colliders in order to put it in fixer state
+    /// Checks whether the vertex is inside the fixers colliders in order to put it in a fixed state
     /// </summary>
     private void CheckFixers()
     {
@@ -539,6 +582,9 @@ public class ClothBehaviour : MonoBehaviour
             }
         }
     }
+    /// <summary>
+    /// Check whether the vertex color value is inside the fixing color condition in order to put it in a fixed state
+    /// </summary>
     private void CheckTextureWeights()
     {
 
@@ -597,7 +643,7 @@ public class ClothBehaviour : MonoBehaviour
         }
     }
     /// <summary>
-    /// Called every step update in the fixed update. Computes the applied wind force of every triangle in the mesh. 
+    /// Called every wind solving iteration. Computes the applied wind force of every triangle in the mesh. 
     /// </summary>
     private void ComputeWindForces()
     {
@@ -682,54 +728,102 @@ public class Node
     public void ComputeForces()
     {
 
-        m_Force += m_Mass.value * m_Gravity.value - m_DampingA.value * m_Mass.value * m_Vel + m_WindForce;
+        m_Force += m_Mass.value * m_Gravity.value - m_DampingA.value * m_Mass.value * m_Vel;
+
+        m_Force += m_WindForce;
 
         m_Force *= m_ForceFactor;
 
-        //m_PenaltyForce = Vector3.zero;
+        m_PenaltyForce = Vector3.zero;
 
     }
-    public MatrixXD ComputePenaltyDifferential(Collider collider)
+    /// <summary>
+    /// Checks if the node is inside the collider of an object
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns>Returns the type of collision. 1 if its sphere type. -1 if its plane type. 0 if theres no collision</returns>
+    public int isColliding(GameObject obj)
     {
-        float k = 50f;
 
-        Vector3 closest = collider.ClosestPoint(m_Pos);
-        Vector3 u = closest - m_Pos;
+        if (obj.GetComponent<SphereCollider>() != null)
+        {
+            SphereCollider collider = obj.GetComponent<SphereCollider>();
+
+            if ((m_Pos - obj.transform.position).magnitude < collider.radius * obj.transform.localScale.x)
+            {
+
+                return 1;
+            }
+        }
+        else
+        {
+            MeshCollider collider = obj.GetComponent<MeshCollider>();
+            //Code here...
+            return -1;
+        }
+        return 0;
+
+    }
+    /// <summary>
+    /// Computes the closest point in the collider surface to the node position
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns>Returns the coordinates of the impact point</returns>
+    public Vector3 ComputeSphereCollision(GameObject obj)
+    {
+        SphereCollider collider = obj.GetComponent<SphereCollider>();
+        Vector3 impactPoint;
+        Vector3 impactDir = m_Pos - collider.transform.position;
+        //Debug.LogWarning(collider.transform.position);
+        impactPoint = collider.transform.TransformPoint(Vector3.ClampMagnitude(impactDir, collider.radius * obj.transform.localScale.x));
+        //Debug.LogWarning(impactPoint);
+        return impactPoint;
+
+    }
+    public MatrixXD ComputeImplicitPenaltyForce(Vector3 impactPoint, float k)
+    {
+
+        Vector3 u = m_Pos - impactPoint;
+        //Debug.LogError("IMPACT point " + impactPoint);
+        //Debug.Log(" nooooode P0Sition" + m_Pos);
         Vector3 oX = u;
-        //float deepness = u.magnitude;
         u.Normalize();
-
-        //Vector3 penaltyForce = -k * deepness * u;
-        //m_PenaltyForce = penaltyForce;
-        //Debug.Log("Force"+penaltyForce);
-        MatrixXD normal = new DenseMatrixXD(1, 3);
+        //Debug.Log("U" + u);
+        MatrixXD normal = new DenseMatrixXD(3, 1);
         normal[0, 0] = u[0];
-        normal[0, 1] = u[1];
-        normal[0, 2] = u[2];
-        //MatrixXD oXProxy = new DenseMatrixXD(1, 3);
-        //oXProxy[0, 0] = oX[0];
-        //oXProxy[0, 1] = oX[1];
-        //oXProxy[0, 2] = oX[2];
+        normal[1, 0] = u[1];
+        normal[2, 0] = u[2];
+        //Debug.Log(normal);
+        MatrixXD oXProxy = new DenseMatrixXD(3, 1);
+        oXProxy[0, 0] = oX[0];
+        oXProxy[1, 0] = oX[1];
+        oXProxy[2, 0] = oX[2];
 
         var normalT = normal.Transpose();
+        Debug.Log(normalT);
 
-        var normalMatrix = normalT * normal;
-        //normalMatrix *= -k;
+        var diff = -k * normal * normalT;
 
-        return normalMatrix;
+        MatrixXD penaltyForce = -k * normal * normalT * oXProxy;
 
-        //VectorXD oXproxy = new DenseVectorXD(3);
-        //oXproxy[0] = oX[0];
-        //oXproxy[1] = oX[1];
-        //oXproxy[2] = oX[2];
-        //var X = normalMatrix.Solve(oXproxy);
-        //X *= -k;
+        m_PenaltyForce[0] = (float)penaltyForce[0, 0];
+        m_PenaltyForce[1] = (float)penaltyForce[1, 0];
+        m_PenaltyForce[2] = (float)penaltyForce[2, 0];
 
-        //Vector3 res = new Vector3((float)X[0], (float)X[1], (float)X[2]);
+        Debug.Log("Penalty" + penaltyForce);
+        Debug.Log("Penalty" + m_PenaltyForce);
 
-        //m_PenaltyForce = res;
-        //Debug.Log(res);
-        //Debug.Break();
+        return diff;
+
+    }
+    public void ComputeExplicitPenaltyForce(Vector3 impactPoint, float k)
+    {
+        Vector3 normal = m_Pos - impactPoint;
+        float deepness = normal.magnitude;
+
+        normal.Normalize();
+
+        m_PenaltyForce=  -k*deepness*normal;
 
     }
 }

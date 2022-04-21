@@ -9,8 +9,10 @@ public class ClothBehaviorEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
+        EditorGUILayout.HelpBox("Apply this modifier to any plane object to achieve realtime cloth phyisics behaviour." +
+            " You can choose different preset parameter setups depending on the resolution of your mesh in the context menu.", MessageType.None);
 
+        base.OnInspectorGUI();
 
 
         ClothBehaviour b = (ClothBehaviour)target;
@@ -29,13 +31,17 @@ public class ClothBehaviorEditor : Editor
 
 
         SerializedProperty fixersList = serializedObject.FindProperty("m_Fixers");
-        SerializedProperty collidingObjects = serializedObject.FindProperty("m_CollidingObjects");
+        SerializedProperty collidingSp = serializedObject.FindProperty("m_CollidingSpheres");
+        SerializedProperty collidingPl = serializedObject.FindProperty("m_CollidingPlanes");
 
 
         b.m_AffectedByWind = EditorGUILayout.Toggle("Affected By Wind", b.m_AffectedByWind);
 
         if (b.m_AffectedByWind)
         {
+            EditorGUILayout.HelpBox("Unity active Wind Zones in scene will be automatically added. Affecting wind force will be equal to the Wind Zones " +
+                "resulting force, so by changing the parameters in these objects (Main, Frequency, Turbulence and Pulse Magnitude) the wind will change.",MessageType.Info);
+
             b.m_WindFriction = EditorGUILayout.Slider("Wind Friction", b.m_WindFriction, 0.0f, 1.0f);
             b.m_WindSolverPrecission = (WindPrecission)EditorGUILayout.EnumPopup("Wind Solver Precission", b.m_WindSolverPrecission);
         }
@@ -44,7 +50,9 @@ public class ClothBehaviorEditor : Editor
         b.m_FixingByTexture = EditorGUILayout.Toggle("Fixing By Gradient", b.m_FixingByTexture);
 
         if (b.m_FixingByTexture)
+
         {
+            EditorGUILayout.HelpBox("In order to use the texture, enable read/write on its import settings and set the alpha source to grayscale.",MessageType.Info);
             b.m_Texture = (Texture2D)EditorGUILayout.ObjectField("Texture", b.m_Texture, typeof(Texture2D), false);
 
         }
@@ -57,7 +65,10 @@ public class ClothBehaviorEditor : Editor
 
         if (b.m_CanCollide)
         {
-            EditorGUILayout.PropertyField(collidingObjects);
+            EditorGUILayout.HelpBox("Only plane and spheric objects will be accepted",MessageType.Info);
+            b.m_PenaltyDamping = EditorGUILayout.Slider("Penalty Damping", b.m_PenaltyDamping,0f,100f);
+            EditorGUILayout.PropertyField(collidingSp);
+            EditorGUILayout.PropertyField(collidingPl);
 
         }
 
