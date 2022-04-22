@@ -1,0 +1,374 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Facial_Mask
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Base HumanLPlatform
+    m_Weight: 0
+  - m_Path: Base HumanPelvis
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanLThigh
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanLThigh/Base HumanLCalf
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanLThigh/Base HumanLCalf/Base HumanLFoot
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanLThigh/Base HumanLCalf/Base HumanLFoot/Base
+      HumanLDigit11
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanLThigh/Base HumanLCalf/Base HumanLFoot/Base
+      HumanLDigit11/Base HumanLDigit12
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanRThigh
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanRThigh/Base HumanRCalf
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanRThigh/Base HumanRCalf/Base HumanRFoot
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanRThigh/Base HumanRCalf/Base HumanRFoot/Base
+      HumanRDigit11
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanRThigh/Base HumanRCalf/Base HumanRFoot/Base
+      HumanRDigit11/Base HumanRDigit12
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit11 1
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit11 1/Base HumanLDigit12 1
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit11 1/Base HumanLDigit12 1/Base
+      HumanLDigit13
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit21
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit21/Base HumanLDigit22
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit21/Base HumanLDigit22/Base HumanLDigit23
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit31
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit31/Base HumanLDigit32
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit31/Base HumanLDigit32/Base HumanLDigit33
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit41
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit41/Base HumanLDigit42
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit41/Base HumanLDigit42/Base HumanLDigit43
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit51
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit51/Base HumanLDigit52
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Base HumanLPalm/Base HumanLDigit51/Base HumanLDigit52/Base HumanLDigit53
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base
+      HumanLForearm/Shield
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead
+    m_Weight: 1
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/Bone001
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/L_Eye_Dummy
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/L_Eye_Dummy/Eye_L
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/L_Plume
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/L_Plume/L_PlumeTip
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/LookAt
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/LookAt/L_Eye_Dummy001
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/LookAt/R_Eye_Dummy001
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/R_Eye_Dummy
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/R_Eye_Dummy/Eye_R
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/R_Plume
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanNeck1/Base HumanNeck2/Base HumanHead/R_Plume/R_PlumeTip
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit11 1
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit11 1/Base HumanRDigit12 1
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit11 1/Base HumanRDigit12 1/Base
+      HumanRDigit13
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit21
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit21/Base HumanRDigit22
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit21/Base HumanRDigit22/Base HumanRDigit23
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit31
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit31/Base HumanRDigit32
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit31/Base HumanRDigit32/Base HumanRDigit33
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit41
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit41/Base HumanRDigit42
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit41/Base HumanRDigit42/Base HumanRDigit43
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit51
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit51/Base HumanRDigit52
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Base HumanRDigit51/Base HumanRDigit52/Base HumanRDigit53
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base
+      HumanRForearm/Base HumanRPalm/Lance
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone016
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone016/Bone017
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone016(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone016(mirrored)/Bone017(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone018
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone018/Bone019
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone018(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone018(mirrored)/Bone019(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone020
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone020/Bone021
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone020(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone020(mirrored)/Bone021(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone022
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone022/Bone023
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone022(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+      HumanSpine4/Base HumanRibcage/Bone022(mirrored)/Bone023(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Bone024
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Bone024/Bone025
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Detail_Left
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Detail_Left/DetailL_Tip
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/DetailL_ArcL
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/DetailL_ArcR
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone004
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone004/Bone005
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone004(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone004(mirrored)/Bone005(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone006
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone006/Bone007
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone006(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone006(mirrored)/Bone007(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone008
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone008/Bone009
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone008(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone008(mirrored)/Bone009(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone010
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone010/Bone011
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone010(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone010(mirrored)/Bone011(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone012
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone012/Bone013
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone012(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone012(mirrored)/Bone013(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone014
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone014/Bone015
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone014(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Bone014(mirrored)/Bone015(mirrored)
+    m_Weight: 0
+  - m_Path: Base HumanPelvis/Sword
+    m_Weight: 0
+  - m_Path: Base HumanRPlatform
+    m_Weight: 0
+  - m_Path: Warrior
+    m_Weight: 0
+  - m_Path: Warrior/Head
+    m_Weight: 0
+  - m_Path: Warrior/PlumesCrest
+    m_Weight: 0
