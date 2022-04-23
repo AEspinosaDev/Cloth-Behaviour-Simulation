@@ -598,6 +598,12 @@ MonoBehaviour:
   m_TimeStep: 0.02
   m_Substeps: 5
   m_Paused: 1
+  m_Gravity: {x: 0, y: -9.81, z: 0}
+  m_NodeMass: 0.03
+  m_NodeDamping: 0.3
+  m_SpringDamping: 0.3
+  m_TractionStiffness: 20
+  m_FlexionStiffness: 15
   m_AffectedByWind: 0
   m_FixingByTexture: 1
   m_CanCollide: 0
@@ -1120,6 +1126,12 @@ MonoBehaviour:
   m_TimeStep: 0.007
   m_Substeps: 1
   m_Paused: 1
+  m_Gravity: {x: 0, y: -9.81, z: 0}
+  m_NodeMass: 0.03
+  m_NodeDamping: 0.3
+  m_SpringDamping: 0.3
+  m_TractionStiffness: 20
+  m_FlexionStiffness: 15
   m_AffectedByWind: 0
   m_FixingByTexture: 1
   m_CanCollide: 1
@@ -1391,12 +1403,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7945908319452971428, guid: c8bb9f24a9ed08541a45b7bc699dacc0, type: 3}
+      propertyPath: Mass
+      value: 0.82
+      objectReference: {fileID: 0}
+    - target: {fileID: 7945908319452971428, guid: c8bb9f24a9ed08541a45b7bc699dacc0, type: 3}
       propertyPath: m_Substeps
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7945908319452971428, guid: c8bb9f24a9ed08541a45b7bc699dacc0, type: 3}
       propertyPath: m_TimeStep
-      value: 0.0087
+      value: 0.007
+      objectReference: {fileID: 0}
+    - target: {fileID: 7945908319452971428, guid: c8bb9f24a9ed08541a45b7bc699dacc0, type: 3}
+      propertyPath: m_NodeMassProxy
+      value: -0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 7945908319452971428, guid: c8bb9f24a9ed08541a45b7bc699dacc0, type: 3}
+      propertyPath: m_SolvingMethod
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7945908319452971428, guid: c8bb9f24a9ed08541a45b7bc699dacc0, type: 3}
       propertyPath: m_CollidingMeshes.Array.size

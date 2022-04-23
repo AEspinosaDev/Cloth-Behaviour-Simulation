@@ -17,19 +17,6 @@ public class ClothBehaviorEditor : Editor
 
         ClothBehaviour b = (ClothBehaviour)target;
 
-        b.m_NodeMass.value = EditorGUILayout.Slider(new GUIContent("Mass By Node", "Controls the mass each vertex weights, not the entire mesh."), b.m_NodeMass.value, 0.0f, 1.0f);
-
-        b.m_Gravity.value = EditorGUILayout.Vector3Field("Gravity", b.m_Gravity.value);
-
-        b.m_NodeDamping.value = EditorGUILayout.Slider(new GUIContent("Node Damping", "A reduction in the amplitude of an oscillation as a result of energy being drained from the system to overcome frictional or other resistive forces. Higher values means more reduction in vertex movement."), b.m_NodeDamping.value, 0.0f, 5.0f);
-
-        b.m_SpringDamping.value = EditorGUILayout.Slider(new GUIContent("Spring Damping", "A reduction in the amplitude of an oscillation as a result of energy being drained from the system to overcome frictional or other resistive forces. Higher values means more reduction in spring contraction forces."), b.m_SpringDamping.value, 0.0f, 5.0f);
-
-        b.m_TractionStiffness.value = EditorGUILayout.FloatField(new GUIContent("Traction Stiffness","Controls the stiffness of the traction springs.These springs control horizontal and vertical movement. The more stiff, the less the mesh will deform and the quicker it will return to initial state."), b.m_TractionStiffness.value);
-
-        b.m_FlexionStiffness.value = EditorGUILayout.FloatField(new GUIContent("Flexion Stiffness","Controls the stiffness of the flexion springs. These springs control shearing and diagonal movement. The more stiff, the less the mesh will deform and the quicker it will return to initial state."), b.m_FlexionStiffness.value);
-
-        
 
         SerializedProperty fixersList = serializedObject.FindProperty("m_Fixers");
         SerializedProperty collidingSp = serializedObject.FindProperty("m_CollidingMeshes");

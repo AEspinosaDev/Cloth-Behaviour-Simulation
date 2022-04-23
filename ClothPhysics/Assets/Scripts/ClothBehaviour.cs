@@ -53,22 +53,27 @@ public class ClothBehaviour : MonoBehaviour
     [Tooltip("It divides the total timestep into the number of substeps. More means more precission, but higher computational load.")]
     [SerializeField] [Range(1, 20)] private int m_Substeps;
 
+    [Tooltip("Press P to pause/resume.")]
     [SerializeField] public bool m_Paused;
 
+    [SerializeField] public Vector3 m_Gravity;
+
+    [Tooltip("Controls the mass each vertex weights, not the entire mesh.")]
+    [SerializeField] [Range(0f, 1f)] public float m_NodeMass;
+
+    [Tooltip("Higher values means more reduction in vertex movement.")]
+    [SerializeField] [Range(0f, 5f)] public float m_NodeDamping;
+
+    [Tooltip("Higher values means more reduction in spring contraction forces.")]
+    [SerializeField] [Range(0f, 5f)] public float m_SpringDamping;
+
+    [Tooltip("Controls the stiffness of the traction springs.These springs control horizontal and vertical movement. The more stiff, the less the mesh will deform and the quicker it will return to its initial state.")]
+    [SerializeField] public float m_TractionStiffness;
+
+    [Tooltip("Controls the stiffness of the flexion springs.These springs control shearing and diagonal movement.The more stiff, the less the mesh will deform and the quicker it will return to initial state.")]
+    [SerializeField] public float m_FlexionStiffness;
+
     //------Managed by custom editor class-----//
-
-    public Ref<Vector3> m_Gravity = new Ref<Vector3>();
-
-    public Ref<float> m_NodeMass = new Ref<float>();
-
-    public Ref<float> m_NodeDamping = new Ref<float>();
-
-    public Ref<float> m_SpringDamping = new Ref<float>();
-
-    public Ref<float> m_TractionStiffness = new Ref<float>();
-
-    public Ref<float> m_FlexionStiffness = new Ref<float>();
-
 
     [HideInInspector] public bool m_AffectedByWind;
 
@@ -99,17 +104,17 @@ public class ClothBehaviour : MonoBehaviour
         m_TimeStep = 0.004f;
         m_Substeps = 5;
 
-        m_Gravity.value = new Vector3(0.0f, -9.81f, 0.0f);
+        m_Gravity = new Vector3(0.0f, -9.81f, 0.0f);
 
         m_Paused = true;
 
-        m_TractionStiffness.value = 20f;
-        m_FlexionStiffness.value = 15f;
+        m_TractionStiffness = 20f;
+        m_FlexionStiffness = 15f;
 
-        m_NodeMass.value = 0.03f;
+        m_NodeMass = 0.03f;
 
-        m_NodeDamping.value = 0.3f;
-        m_SpringDamping.value = 0.3f;
+        m_NodeDamping = 0.3f;
+        m_SpringDamping = 0.3f;
 
         m_SolvingMethod = Solver.Simplectic;
 
@@ -144,7 +149,7 @@ public class ClothBehaviour : MonoBehaviour
     private void LowResSetup()
     {
         m_TimeStep = 0.02f; m_Paused = true;
-        m_TractionStiffness.value = 20f; m_FlexionStiffness.value = 15f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
+        m_TractionStiffness = 20f; m_FlexionStiffness = 15f; m_NodeMass = 0.03f; m_NodeDamping = 0.3f; m_SpringDamping = 0.3f;
         m_SolvingMethod = Solver.Simplectic;
         m_WindSolverPrecission = WindPrecission.High;
     }
@@ -152,7 +157,7 @@ public class ClothBehaviour : MonoBehaviour
     private void MedResSetup()
     {
         m_TimeStep = 0.01f; m_Substeps = 2; m_Paused = true;
-        m_TractionStiffness.value = 50f; m_FlexionStiffness.value = 30f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
+        m_TractionStiffness = 50f; m_FlexionStiffness = 30f; m_NodeMass = 0.03f; m_NodeDamping = 0.3f; m_SpringDamping = 0.3f;
         m_SolvingMethod = Solver.Simplectic;
         m_WindSolverPrecission = WindPrecission.Medium;
     }
@@ -160,7 +165,7 @@ public class ClothBehaviour : MonoBehaviour
     private void HighResSetup()
     {
         m_TimeStep = 0.007f; m_Substeps = 1; m_Paused = true;
-        m_TractionStiffness.value = 100f; m_FlexionStiffness.value = 80f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
+        m_TractionStiffness = 100f; m_FlexionStiffness = 80f; m_NodeMass = 0.03f; m_NodeDamping = 0.3f; m_SpringDamping = 0.3f;
         m_SolvingMethod = Solver.Simplectic;
         m_WindSolverPrecission = WindPrecission.Low;
     }
@@ -184,7 +189,7 @@ public class ClothBehaviour : MonoBehaviour
         {
             //For simulation purposes, transform the points to global coordinates
 
-            m_Nodes.Add(new Node(i, transform.TransformPoint(m_Vertices[i]), m_NodeMass, m_NodeDamping, m_Gravity, vertex_UVs[i]));
+            m_Nodes.Add(new Node(i, transform.TransformPoint(m_Vertices[i]), this, vertex_UVs[i]));
         }
 
 
@@ -209,14 +214,14 @@ public class ClothBehaviour : MonoBehaviour
                     //La arista está en el diccionario
                     otherEdge.m_A = otherEdge.m_O;
                     otherEdge.m_B = edge.m_O;
-                    m_Springs.Add(new Spring(m_Nodes[otherEdge.m_A], m_Nodes[otherEdge.m_B], m_FlexionStiffness, m_SpringDamping));
+                    m_Springs.Add(new Spring(m_Nodes[otherEdge.m_A], m_Nodes[otherEdge.m_B], this, false));
 
                 }
                 else
                 {
 
                     //La arista no está en el diccionario
-                    m_Springs.Add(new Spring(m_Nodes[edge.m_A], m_Nodes[edge.m_B], m_TractionStiffness, m_SpringDamping));
+                    m_Springs.Add(new Spring(m_Nodes[edge.m_A], m_Nodes[edge.m_B], this, true));
                     edgeDictionary.Add(edge, edge);
                 }
             }
@@ -337,13 +342,13 @@ public class ClothBehaviour : MonoBehaviour
                         int condition = n.isColliding(obj, m_CollisionOffsetDistance);
                         if (condition > 0)
                         {
-                            n.ComputeExplicitPenaltyForce(n.ComputeCollision(obj, condition, m_CollisionOffsetDistance), m_PenaltyStiffness);
+                            n.ComputeExplicitPenaltyForce(n.ComputeCollision(obj, condition), m_PenaltyStiffness);
                             n.m_Force += n.m_PenaltyForce;
                         }
                     }
                 }
                 n.m_Pos += m_SubTimeStep * n.m_Vel;
-                n.m_Vel += m_SubTimeStep / n.m_Mass.value * n.m_Force;
+                n.m_Vel += m_SubTimeStep / m_NodeMass * n.m_Force;
             }
         }
 
@@ -370,7 +375,7 @@ public class ClothBehaviour : MonoBehaviour
         {
             if (!n.m_Fixed)
             {
-                Vector3 resVel = n.m_Vel + m_SubTimeStep / n.m_Mass.value * n.m_Force;
+                Vector3 resVel = n.m_Vel + m_SubTimeStep / m_NodeMass * n.m_Force;
                 if (m_CanCollide)
                 {
                     foreach (var obj in m_CollidingMeshes)
@@ -378,9 +383,9 @@ public class ClothBehaviour : MonoBehaviour
                         int condition = n.isColliding(obj, m_CollisionOffsetDistance);
                         if (condition > 0)
                         {
-                            n.ComputeExplicitPenaltyForce(n.ComputeCollision(obj, condition, m_CollisionOffsetDistance), m_PenaltyStiffness);
+                            n.ComputeExplicitPenaltyForce(n.ComputeCollision(obj, condition), m_PenaltyStiffness);
                             n.m_Force += n.m_PenaltyForce;
-                            resVel = n.m_Vel + m_SubTimeStep / n.m_Mass.value * n.m_Force;
+                            resVel = n.m_Vel + m_SubTimeStep / m_NodeMass * n.m_Force;
                         }
                     }
                 }
@@ -422,7 +427,7 @@ public class ClothBehaviour : MonoBehaviour
         {
             if (!n.m_Fixed)
             {
-                Vector3 resVel = n.m_Vel + (m_SubTimeStep * 0.5f) / n.m_Mass.value * n.m_Force;
+                Vector3 resVel = n.m_Vel + (m_SubTimeStep * 0.5f) / m_NodeMass * n.m_Force;
                 if (m_CanCollide)
                 {
                     foreach (var obj in m_CollidingMeshes)
@@ -430,9 +435,9 @@ public class ClothBehaviour : MonoBehaviour
                         int condition = n.isColliding(obj, m_CollisionOffsetDistance);
                         if (condition > 0)
                         {
-                            n.ComputeExplicitPenaltyForce(n.ComputeCollision(obj, condition, m_CollisionOffsetDistance), m_PenaltyStiffness);
+                            n.ComputeExplicitPenaltyForce(n.ComputeCollision(obj, condition), m_PenaltyStiffness);
                             n.m_Force += n.m_PenaltyForce;
-                            resVel = n.m_Vel + (m_SubTimeStep * 0.5f) / n.m_Mass.value * n.m_Force;
+                            resVel = n.m_Vel + (m_SubTimeStep * 0.5f) / m_NodeMass * n.m_Force;
                         }
                     }
                 }
@@ -459,7 +464,7 @@ public class ClothBehaviour : MonoBehaviour
 
             if (!m_Nodes[i].m_Fixed)
             {
-                Vector3 resVel = m_Vel0[i] + m_SubTimeStep / m_Nodes[i].m_Mass.value * m_Nodes[i].m_Force;
+                Vector3 resVel = m_Vel0[i] + m_SubTimeStep / m_NodeMass * m_Nodes[i].m_Force;
                 if (m_CanCollide)
                 {
                     foreach (var obj in m_CollidingMeshes)
@@ -467,9 +472,9 @@ public class ClothBehaviour : MonoBehaviour
                         int condition = m_Nodes[i].isColliding(obj, m_CollisionOffsetDistance);
                         if (condition > 0)
                         {
-                            m_Nodes[i].ComputeExplicitPenaltyForce(m_Nodes[i].ComputeCollision(obj, condition, m_CollisionOffsetDistance), m_PenaltyStiffness);
+                            m_Nodes[i].ComputeExplicitPenaltyForce(m_Nodes[i].ComputeCollision(obj, condition), m_PenaltyStiffness);
                             m_Nodes[i].m_Force += m_Nodes[i].m_PenaltyForce;
-                            resVel = m_Vel0[i] + m_SubTimeStep / m_Nodes[i].m_Mass.value * m_Nodes[i].m_Force;
+                            resVel = m_Vel0[i] + m_SubTimeStep / m_NodeMass * m_Nodes[i].m_Force;
                         }
                     }
                 }
@@ -502,7 +507,7 @@ public class ClothBehaviour : MonoBehaviour
         {
             if (!n.m_Fixed)
             {
-                resVel = n.m_Vel + m_SubTimeStep / n.m_Mass.value * n.m_Force;
+                resVel = n.m_Vel + m_SubTimeStep / m_NodeMass * n.m_Force;
                 if (m_CanCollide)
                 {
                     foreach (var obj in m_CollidingMeshes)
@@ -510,17 +515,17 @@ public class ClothBehaviour : MonoBehaviour
                         int condition = n.isColliding(obj, m_CollisionOffsetDistance);
                         if (condition > 0)
                         {
-                            MatrixXD diff = n.ComputeImplicitPenaltyForce(n.ComputeCollision(obj, condition, m_CollisionOffsetDistance), m_PenaltyStiffness);
+                            MatrixXD diff = n.ComputeImplicitPenaltyForce(n.ComputeCollision(obj, condition), m_PenaltyStiffness);
 
                             MatrixXD i = new DenseMatrixXD(3);
                             i = DenseMatrixXD.CreateIdentity(3);
 
-                            Vector3 b = n.m_Vel + m_SubTimeStep / n.m_Mass.value * (n.m_PenaltyForce + n.m_Force); //Spring and wind force already computed in n.m_Force
+                            Vector3 b = n.m_Vel + m_SubTimeStep / m_NodeMass * (n.m_PenaltyForce + n.m_Force); //Spring and wind force already computed in n.m_Force
 
                             VectorXD bProxy = new DenseVectorXD(3);
                             bProxy[0] = b.x; bProxy[1] = b.y; bProxy[2] = b.z;
 
-                            var x = (i - (m_SubTimeStep * m_SubTimeStep / n.m_Mass.value) * diff).Solve(bProxy);
+                            var x = (i - (m_SubTimeStep * m_SubTimeStep / m_NodeMass) * diff).Solve(bProxy);
 
                             resVel = new Vector3((float)x[0], (float)x[1], (float)x[2]);
 
@@ -676,9 +681,7 @@ public class Node
     public Vector3 m_Vel;
     public Vector3 m_Force;
     public float m_ForceFactor;
-    public Ref<float> m_Mass;
-    public Ref<float> m_DampingA;
-    public Ref<Vector3> m_Gravity;
+
 
     public Vector3 m_offset;            //Only if fixed enabled
 
@@ -688,9 +691,10 @@ public class Node
     public Vector3 m_PenaltyForce;      //Only if collisions enabled
 
     public Vector2 m_UV;
+    public ClothBehaviour m_Manager;
 
 
-    public Node(int iD, Vector3 pos, Ref<float> mass, Ref<float> damping, Ref<Vector3> grav, Vector2 uv)
+    public Node(int iD, Vector3 pos, ClothBehaviour manager, Vector2 uv)
     {
         m_Fixed = false;
         m_Id = iD;
@@ -699,9 +703,9 @@ public class Node
         m_UV = uv;
         m_ForceFactor = 1f;
         m_Fixer = null;
-        m_DampingA = damping;
-        m_Mass = mass;
-        m_Gravity = grav;
+
+        m_Manager = manager;
+
     }
 
     /// <summary>
@@ -711,7 +715,7 @@ public class Node
     public void ComputeForces()
     {
 
-        m_Force += m_Mass.value * m_Gravity.value - m_DampingA.value * m_Mass.value * m_Vel;
+        m_Force += m_Manager.m_NodeMass * m_Manager.m_Gravity - m_Manager.m_NodeDamping * m_Manager.m_NodeMass * m_Vel;
 
         m_Force += m_WindForce;
 
@@ -758,7 +762,7 @@ public class Node
     /// <param name="obj"></param>
     /// <param name="condition"></param>
     /// <returns>Returns the coordinates of the impact point</returns>
-    public Vector3 ComputeCollision(GameObject obj, float condition, float offset)
+    public Vector3 ComputeCollision(GameObject obj, float condition)
     {
         Vector3 impactPoint;
         switch (condition)
@@ -766,7 +770,7 @@ public class Node
             case 1:
                 impactPoint = ComputeSphereCollision(obj); break;
             case 2:
-                impactPoint = ComputePlaneCollision(obj, offset); break;
+                impactPoint = ComputePlaneCollision(obj); break;
             case 3:
                 impactPoint = ComputeBoxCollision(obj); break;
             default:
@@ -785,7 +789,6 @@ public class Node
         Vector3 impactPoint;
         Vector3 impactDir = m_Pos - collider.transform.position;
         impactPoint = m_Pos + Vector3.ClampMagnitude(impactDir, collider.radius * obj.transform.lossyScale.x);
-        //impactPoint = 
         return impactPoint;
 
     }
@@ -794,10 +797,10 @@ public class Node
     /// </summary>
     /// <param name="obj"></param>
     /// <returns>Returns the coordinates of the impact point</returns>
-    private Vector3 ComputePlaneCollision(GameObject obj, float offset)
+    private Vector3 ComputePlaneCollision(GameObject obj)
     {
         MeshCollider collider = obj.GetComponent<MeshCollider>();
-        Vector3 impactPoint = m_Pos + (collider.transform.up * (-collider.transform.InverseTransformPoint(m_Pos).y + offset));
+        Vector3 impactPoint = m_Pos + (collider.transform.up * (-collider.transform.InverseTransformPoint(m_Pos).y + m_Manager.m_CollisionOffsetDistance));
         return impactPoint;
     }
     /// <summary>
@@ -878,19 +881,19 @@ public class Spring
 
     public float m_Length0;
     public float m_Length;
-    public Ref<float> m_Stiffness;
-    public Ref<float> m_Damping;
+    public float m_Stiffness;
 
+    bool m_TypeTraction;
+    ClothBehaviour m_Manager;
 
-
-    public Spring(Node nodeA, Node nodeB, Ref<float> stiff, Ref<float> damping)
+    public Spring(Node nodeA, Node nodeB, ClothBehaviour manager, bool type)
     {
         m_NodeA = nodeA;
         m_NodeB = nodeB;
         m_Length0 = (m_NodeA.m_Pos - m_NodeB.m_Pos).magnitude;
         m_Length = m_Length0;
-        m_Stiffness = stiff; //boin oi oi oi oing
-        m_Damping = damping;
+        m_Manager = manager;
+        m_TypeTraction = type;
     }
 
     /// <summary>
@@ -899,12 +902,15 @@ public class Spring
     public void ComputeForces()
     {
 
+        if (m_TypeTraction) m_Stiffness = m_Manager.m_TractionStiffness;
+        else m_Stiffness = m_Manager.m_FlexionStiffness;
+
         Vector3 u = m_NodeA.m_Pos - m_NodeB.m_Pos;
         m_Length = u.magnitude;
         u.Normalize();
 
-        float dampForce = -m_Damping.value * Vector3.Dot(u, (m_NodeA.m_Vel - m_NodeB.m_Vel));
-        float stress = -m_Stiffness.value * (m_Length - m_Length0) + dampForce;
+        float dampForce = -m_Manager.m_SpringDamping * Vector3.Dot(u, (m_NodeA.m_Vel - m_NodeB.m_Vel));
+        float stress = -m_Stiffness * (m_Length - m_Length0) + dampForce;
         Vector3 force = stress * u;
         m_NodeA.m_Force += force;
         m_NodeB.m_Force -= force;

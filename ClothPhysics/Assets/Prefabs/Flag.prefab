@@ -60,7 +60,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 70b576430eb833b40a55b76283e3161b, type: 2}
+  - {fileID: 2100000, guid: 516756ee5f1086b41bd4f251528122b4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -98,6 +98,12 @@ MonoBehaviour:
   m_TimeStep: 0.02
   m_Substeps: 5
   m_Paused: 1
+  m_Gravity: {x: 0, y: -9.81, z: 0}
+  m_NodeMass: 0.03
+  m_NodeDamping: 0.3
+  m_SpringDamping: 0.3
+  m_TractionStiffness: 20
+  m_FlexionStiffness: 15
   m_AffectedByWind: 1
   m_FixingByTexture: 0
   m_CanCollide: 1
