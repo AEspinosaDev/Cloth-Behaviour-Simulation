@@ -87,7 +87,6 @@ public class ClothBehaviour : MonoBehaviour
     [HideInInspector] public List<GameObject> m_Fixers;
 
     [HideInInspector] public List<GameObject> m_CollidingMeshes;
-    //[HideInInspector] public List<GameObject> m_CollidingPlanes;
 
     [HideInInspector] public float m_PenaltyStiffness;
     [HideInInspector] public float m_CollisionOffsetDistance;
@@ -112,7 +111,7 @@ public class ClothBehaviour : MonoBehaviour
         m_NodeDamping.value = 0.3f;
         m_SpringDamping.value = 0.3f;
 
-        m_SolvingMethod = Solver.Symplectic;
+        m_SolvingMethod = Solver.Simplectic;
 
         m_FixedNodes = new List<Node>();
 
@@ -129,9 +128,9 @@ public class ClothBehaviour : MonoBehaviour
     public enum Solver
     {
         Explicit = 0,
-        Symplectic = 1,
+        Simplectic = 1,
         Midpoint = 2,
-        ImplicitCollisions = 3,
+        SimplecticWithImplicitCollisions = 3,
     };
     public enum WindPrecission
     {
@@ -146,7 +145,7 @@ public class ClothBehaviour : MonoBehaviour
     {
         m_TimeStep = 0.02f; m_Paused = true;
         m_TractionStiffness.value = 20f; m_FlexionStiffness.value = 15f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
-        m_SolvingMethod = Solver.Symplectic;
+        m_SolvingMethod = Solver.Simplectic;
         m_WindSolverPrecission = WindPrecission.High;
     }
     [ContextMenu("Medium Res Mesh Setup")]
@@ -154,7 +153,7 @@ public class ClothBehaviour : MonoBehaviour
     {
         m_TimeStep = 0.01f; m_Substeps = 2; m_Paused = true;
         m_TractionStiffness.value = 50f; m_FlexionStiffness.value = 30f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
-        m_SolvingMethod = Solver.Symplectic;
+        m_SolvingMethod = Solver.Simplectic;
         m_WindSolverPrecission = WindPrecission.Medium;
     }
     [ContextMenu("High Res Mesh Setup")]
@@ -162,7 +161,7 @@ public class ClothBehaviour : MonoBehaviour
     {
         m_TimeStep = 0.007f; m_Substeps = 1; m_Paused = true;
         m_TractionStiffness.value = 100f; m_FlexionStiffness.value = 80f; m_NodeMass.value = 0.03f; m_NodeDamping.value = 0.3f; m_SpringDamping.value = 0.3f;
-        m_SolvingMethod = Solver.Symplectic;
+        m_SolvingMethod = Solver.Simplectic;
         m_WindSolverPrecission = WindPrecission.Low;
     }
     #endregion
@@ -293,11 +292,11 @@ public class ClothBehaviour : MonoBehaviour
 
                 case Solver.Explicit: StepExplicit(); break;
 
-                case Solver.Symplectic: StepSimplectic(); break;
+                case Solver.Simplectic: StepSimplectic(); break;
 
                 case Solver.Midpoint: StepRK2(); break;
 
-                case Solver.ImplicitCollisions: StepSimplecticWithImplicitCollision(); break;
+                case Solver.SimplecticWithImplicitCollisions: StepSimplecticWithImplicitCollision(); break;
 
                 default:
                     throw new System.Exception("[ERROR] Should never happen!");
@@ -311,7 +310,7 @@ public class ClothBehaviour : MonoBehaviour
 
     #region PhysicsSolvers
     /// <summary>
-    /// Worst solver. Good for simple assets or arcade physics
+    /// Worst solver. Good for simple assets or arcade physics.
     /// </summary>
     private void StepExplicit()
     {
@@ -525,9 +524,6 @@ public class ClothBehaviour : MonoBehaviour
 
                             resVel = new Vector3((float)x[0], (float)x[1], (float)x[2]);
 
-                            break;
-
-
                         }
                     }
 
@@ -543,7 +539,7 @@ public class ClothBehaviour : MonoBehaviour
 
     #endregion
     /// <summary>
-    /// Checks whether the vertex is inside the fixers colliders in order to put it in a fixed state
+    /// Checks whether the vertex is inside the fixer colliders in order to put it in a fixed state.
     /// </summary>
     private void CheckFixers()
     {
@@ -557,64 +553,17 @@ public class ClothBehaviour : MonoBehaviour
                 if (collider.bounds.Contains(n_pos))
                 {
                     node.m_Fixed = true;
-                    if (node.m_Fixer != null) Debug.LogWarning("More than one fixer assinged to the vertex. It will only be accepted one");
+                    if (node.m_Fixer != null) Debug.LogWarning("[Warning] More than one fixer assinged to the vertex. It will only be accepted one");
                     node.m_Fixer = obj;
                     node.m_offset = node.m_Fixer.transform.InverseTransformPoint(node.m_Pos);
                     m_FixedNodes.Add(node);
 
                 }
-                #region OwnCollisionAlgorithms
-                //PROGRAMMED COLLISION ALGORITHMS
-
-                //Vector3 f_center = collider.bounds.center;
-                //    if (collider.GetType() == typeof(SphereCollider))
-                //    {
-                //        //Simple collision function with spheres
-                //        float f_radius = obj.GetComponent<SphereCollider>().radius;
-                //        float dist = (n_pos - f_center).magnitude;
-
-                //        if (dist <= f_radius)
-                //        {
-                //            node.m_Fixed = true;
-                //            if (node.m_Fixer != null) Debug.LogWarning("More than one fixer assinged to the vertex. It will only be accepted one");
-                //            node.m_Fixer = obj;
-                //            node.m_offset = node.m_Pos - node.m_Fixer.transform.position;
-                //            m_FixedNodes.Add(node);
-                //        }
-
-                //    }
-                //    else
-                //    {
-                //        //Simple collision function with boxes
-                //        Vector3 f_size = collider.bounds.extents;
-                //        //f_size = transform.InverseTransformPoint(f_size);
-
-                //        float x_dist = Mathf.Abs(f_center.x - n_pos.x);
-                //        float y_dist = Mathf.Abs(f_center.y - n_pos.y);
-                //        float z_dist = Mathf.Abs(f_center.z - n_pos.z);
-
-
-                //        int condition = 0;
-                //        if (x_dist <= f_size.x) condition++;
-                //        if (y_dist <= f_size.y) condition++;
-                //        if (z_dist <= f_size.z) condition++;
-
-                //        if (condition == 3)
-                //        {
-                //            node.m_Fixed = true;
-                //            if (node.m_Fixer != null) Debug.LogWarning("More than one fixer assinged to the vertex. It will only be accepted one");
-                //            node.m_Fixer = obj;
-                //            node.m_offset = node.m_Pos - node.m_Fixer.transform.position;
-                //            m_FixedNodes.Add(node);
-                //        }
-
-                //    }
-                #endregion
             }
         }
     }
     /// <summary>
-    /// Check whether the vertex color value is inside the fixing color condition in order to put it in a fixed state
+    /// Check whether the vertex color value is inside the fixing color condition in order to put it in a fixed state.
     /// </summary>
     private void CheckTextureWeights()
     {
@@ -645,7 +594,7 @@ public class ClothBehaviour : MonoBehaviour
 
     }
     /// <summary>
-    /// Automatically called on start. Checks for wind objects in order to take them into account to make the wind simulation
+    /// Automatically called on start. Checks for wind objects in order to take them into account to make the wind simulation.
     /// </summary>
     private void CheckWindObjects()
     {
@@ -782,7 +731,7 @@ public class Node
         {
             SphereCollider collider = obj.GetComponent<SphereCollider>();
 
-            if ((m_Pos - obj.transform.position).magnitude < collider.radius * obj.transform.lossyScale.x + offset) return 1;
+            if (collider.transform.InverseTransformPoint(m_Pos).magnitude < collider.radius + offset) return 1;
 
         }
         else if (obj.GetComponent<MeshCollider>() != null)
@@ -804,7 +753,7 @@ public class Node
 
     }
     /// <summary>
-    /// Computes the closest point in any kind of supported collider to the node position
+    /// Computes the closest point in any kind of supported collider surface to the node position
     /// </summary>
     /// <param name="obj"></param>
     /// <param name="condition"></param>
@@ -835,7 +784,8 @@ public class Node
         SphereCollider collider = obj.GetComponent<SphereCollider>();
         Vector3 impactPoint;
         Vector3 impactDir = m_Pos - collider.transform.position;
-        impactPoint = collider.transform.TransformPoint(Vector3.ClampMagnitude(impactDir, collider.radius * obj.transform.lossyScale.x));
+        impactPoint = m_Pos + Vector3.ClampMagnitude(impactDir, collider.radius * obj.transform.lossyScale.x);
+        //impactPoint = 
         return impactPoint;
 
     }
@@ -862,12 +812,18 @@ public class Node
         float angleX = Vector3.Angle(collider.transform.right, localNodePos);
         float angleY = Vector3.Angle(collider.transform.up, localNodePos);
         float angleZ = Vector3.Angle(collider.transform.forward, localNodePos);
-        if(angleX < angleY && angleX < angleZ) return collider.transform.right;
-        if(angleY < angleX && angleY < angleZ) return collider.transform.right ;
-        if(angleZ < angleY && angleZ < angleX) return collider.transform.right ;
+        if (angleX < angleY && angleX < angleZ) return collider.transform.right;
+        if (angleY < angleX && angleY < angleZ) return collider.transform.right;
+        if (angleZ < angleY && angleZ < angleX) return collider.transform.right;
         throw new System.Exception("[ERROR] Should never happen!");
 
     }
+    /// <summary>
+    /// Implicitly computes the penalty force by calculating the penalty force and the penalty force differential matrix.
+    /// </summary>
+    /// <param name="impactPoint"></param>
+    /// <param name="k"></param>
+    /// <returns>Returns the differential</returns>
     public MatrixXD ComputeImplicitPenaltyForce(Vector3 impactPoint, float k)
     {
 
@@ -896,6 +852,11 @@ public class Node
         return diff;
 
     }
+    /// <summary>
+    /// Explicitly computes the penalty force on a point in time.
+    /// </summary>
+    /// <param name="impactPoint"></param>
+    /// <param name="k"></param>
     public void ComputeExplicitPenaltyForce(Vector3 impactPoint, float k)
     {
         Vector3 normal = m_Pos - impactPoint;

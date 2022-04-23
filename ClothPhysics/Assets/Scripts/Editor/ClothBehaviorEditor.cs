@@ -43,7 +43,7 @@ public class ClothBehaviorEditor : Editor
                 "resulting force, so by changing the parameters in these objects (Main, Frequency, Turbulence and Pulse Magnitude) the wind will change.",MessageType.Info);
 
             b.m_WindFriction = EditorGUILayout.Slider(new GUIContent("Wind Friction","Friction applied by the wind to the mesh surface. Higher values means more resistance."), b.m_WindFriction, 0.0f, 1.0f);
-            b.m_WindSolverPrecission = (WindPrecission)EditorGUILayout.EnumPopup(new GUIContent("Wind Solver Precission", "Controls how many iterations is the wind force computed. Higher values menas more computational load."), b.m_WindSolverPrecission);
+            b.m_WindSolverPrecission = (WindPrecission)EditorGUILayout.EnumPopup(new GUIContent("Wind Solver Precission", "Controls how many iterations is the wind force computed. Higher values means more computational load."), b.m_WindSolverPrecission);
         }
 
 
