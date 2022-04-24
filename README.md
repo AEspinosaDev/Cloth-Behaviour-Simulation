@@ -50,7 +50,9 @@ It works by applying it to any plane mash as a component.
 
 
 
+<H2></H2>
 
+All assets shown in the video are made by me. If you are curious about the designs, you can check them out on my Artstation page.
 
 
 
