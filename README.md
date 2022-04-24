@@ -1,7 +1,5 @@
-# Cloth-Behaviour-Simulation
+<H1 ALIGN="CENTER"> CLOTH BEHAVIOUR PLUGIN FOR UNITY </H1>
+
 Cloth simulation using a mass spring physics aproach.
 
-Explicit solver.
-Symplectic solver.
-RK2 solver.
-Implicit solver. WIP
+
