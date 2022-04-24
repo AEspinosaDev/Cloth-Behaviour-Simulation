@@ -1,4 +1,4 @@
-<H1 ALIGN="CENTER"> CLOTH BEHAVIOUR PLUGIN FOR UNITY </H1>
+<H1 ALIGN="CENTER"> CLOTH BEHAVIOUR PLUGIN FOR UNITY 👚</H1>
 <p align="center"> 
 Cloth simulation using a mass spring physics aproach.
 
