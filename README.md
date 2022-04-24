@@ -16,9 +16,9 @@ Cloth simulation using a mass spring physics aproach.
   
 <img src="https://user-images.githubusercontent.com/79087129/164988514-07c619a1-bae2-45cd-abbf-7032b14dda46.gif">
 
+<img src="https://user-images.githubusercontent.com/79087129/164988978-cf9ec231-66e0-41d7-899d-c4161067373d.gif">
 
-<img src="https://user-images.githubusercontent.com/79087129/164988370-8d480971-ab45-4954-8f16-94f2f64fa831.gif">
-  
+
 <img src="https://user-images.githubusercontent.com/79087129/164988786-a3fba59c-b95b-4930-84d3-b92ef0b6d8ae.gif">
 </p>
 
