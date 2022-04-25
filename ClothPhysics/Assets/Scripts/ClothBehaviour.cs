@@ -39,6 +39,9 @@ public class ClothBehaviour : MonoBehaviour
 
     [HideInInspector] private float m_SubTimeStep;
 
+    [HideInInspector] public float m_NodeMass;
+
+
     #endregion 
 
 
@@ -58,8 +61,8 @@ public class ClothBehaviour : MonoBehaviour
 
     [SerializeField] public Vector3 m_Gravity;
 
-    [Tooltip("Controls the mass each vertex weights, not the entire mesh.")]
-    [SerializeField] [Range(0f, 1f)] public float m_NodeMass;
+    [Tooltip("Controls the mass of the entire mesh, assuming it will be equally divided into each node.")]
+    [SerializeField] [Range(0, 50)] public float m_MeshMass;
 
     [Tooltip("Higher values means more reduction in vertex movement.")]
     [SerializeField] [Range(0f, 5f)] public float m_NodeDamping;
@@ -111,7 +114,7 @@ public class ClothBehaviour : MonoBehaviour
         m_TractionStiffness = 20f;
         m_FlexionStiffness = 15f;
 
-        m_NodeMass = 0.03f;
+        m_MeshMass = 3.63f;
 
         m_NodeDamping = 0.3f;
         m_SpringDamping = 0.3f;
@@ -149,7 +152,7 @@ public class ClothBehaviour : MonoBehaviour
     private void LowResSetup()
     {
         m_TimeStep = 0.02f; m_Paused = true;
-        m_TractionStiffness = 20f; m_FlexionStiffness = 15f; m_NodeMass = 0.03f; m_NodeDamping = 0.3f; m_SpringDamping = 0.3f;
+        m_TractionStiffness = 20f; m_FlexionStiffness = 15f; m_MeshMass = 3.6f; m_NodeDamping = 0.3f; m_SpringDamping = 0.3f;
         m_SolvingMethod = Solver.Simplectic;
         m_WindSolverPrecission = WindPrecission.High;
     }
@@ -157,7 +160,7 @@ public class ClothBehaviour : MonoBehaviour
     private void MedResSetup()
     {
         m_TimeStep = 0.01f; m_Substeps = 2; m_Paused = true;
-        m_TractionStiffness = 50f; m_FlexionStiffness = 30f; m_NodeMass = 0.03f; m_NodeDamping = 0.3f; m_SpringDamping = 0.3f;
+        m_TractionStiffness = 50f; m_FlexionStiffness = 30f; m_MeshMass = 20f; m_NodeDamping = 0.3f; m_SpringDamping = 0.3f;
         m_SolvingMethod = Solver.Simplectic;
         m_WindSolverPrecission = WindPrecission.Medium;
     }
@@ -165,7 +168,7 @@ public class ClothBehaviour : MonoBehaviour
     private void HighResSetup()
     {
         m_TimeStep = 0.007f; m_Substeps = 1; m_Paused = true;
-        m_TractionStiffness = 100f; m_FlexionStiffness = 80f; m_NodeMass = 0.03f; m_NodeDamping = 0.3f; m_SpringDamping = 0.3f;
+        m_TractionStiffness = 100f; m_FlexionStiffness = 80f; m_MeshMass = 50f; m_NodeDamping = 0.3f; m_SpringDamping = 0.3f;
         m_SolvingMethod = Solver.Simplectic;
         m_WindSolverPrecission = WindPrecission.Low;
     }
@@ -183,7 +186,7 @@ public class ClothBehaviour : MonoBehaviour
 
         m_Nodes = new List<Node>();
 
-
+        m_NodeMass = m_MeshMass / m_Vertices.Length;
 
         for (int i = 0; i < m_Mesh.vertexCount; i++)
         {
@@ -244,6 +247,7 @@ public class ClothBehaviour : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.P))
             this.m_Paused = !this.m_Paused;
 
+        m_NodeMass = m_MeshMass / m_Vertices.Length;
         m_SubTimeStep = m_TimeStep / m_Substeps;
 
         CheckWindObjects();
@@ -741,8 +745,8 @@ public class Node
         else if (obj.GetComponent<MeshCollider>() != null)
         {
             MeshCollider collider = obj.GetComponent<MeshCollider>();
-            float xExtension = collider.bounds.extents.x;
-            float zExtension = collider.bounds.extents.z;
+            float xExtension = collider.sharedMesh.bounds.extents.x;
+            float zExtension = collider.sharedMesh.bounds.extents.z;
             Vector3 nodeLocalPos = obj.transform.InverseTransformPoint(m_Pos);
             if (nodeLocalPos.y <= 0f + offset && nodeLocalPos.y >= -1.0f && Mathf.Abs(nodeLocalPos.z) <= zExtension && Mathf.Abs(nodeLocalPos.x) <= xExtension) return 2;
         }

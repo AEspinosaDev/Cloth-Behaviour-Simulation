@@ -5,6 +5,7 @@ using static ClothBehaviour;
 
 
 [CustomEditor(typeof(ClothBehaviour))]
+[CanEditMultipleObjects]
 public class ClothBehaviorEditor : Editor
 {
     public override void OnInspectorGUI()

@@ -594,12 +594,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64ea09637adbe6041bed55d9f421aca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_NodeMass: 0.03
   m_SolvingMethod: 1
   m_TimeStep: 0.02
   m_Substeps: 5
   m_Paused: 1
   m_Gravity: {x: 0, y: -9.81, z: 0}
-  m_NodeMass: 0.03
+  m_MeshMass: 0
   m_NodeDamping: 0.3
   m_SpringDamping: 0.3
   m_TractionStiffness: 20
@@ -813,6 +814,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6174403516559788333, guid: 82e3ccf40b371f1488a235d98adcf249, type: 3}
+      propertyPath: m_MeshMass
+      value: 3.6
+      objectReference: {fileID: 0}
     - target: {fileID: 6174403516559788333, guid: 82e3ccf40b371f1488a235d98adcf249, type: 3}
       propertyPath: m_CollidingMeshes.Array.data[0]
       value: 
@@ -1122,12 +1127,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64ea09637adbe6041bed55d9f421aca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_NodeMass: 0.03
   m_SolvingMethod: 1
   m_TimeStep: 0.007
   m_Substeps: 1
   m_Paused: 1
   m_Gravity: {x: 0, y: -9.81, z: 0}
-  m_NodeMass: 0.03
+  m_MeshMass: 0
   m_NodeDamping: 0.3
   m_SpringDamping: 0.3
   m_TractionStiffness: 20
@@ -1290,6 +1296,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 6174403516559788333, guid: 82e3ccf40b371f1488a235d98adcf249, type: 3}
+      propertyPath: m_MeshMass
+      value: 3.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6174403516559788333, guid: 82e3ccf40b371f1488a235d98adcf249, type: 3}
       propertyPath: m_CollidingMeshes.Array.data[0]
       value: 
       objectReference: {fileID: 1549091143}
@@ -1405,6 +1415,10 @@ PrefabInstance:
     - target: {fileID: 7945908319452971428, guid: c8bb9f24a9ed08541a45b7bc699dacc0, type: 3}
       propertyPath: Mass
       value: 0.82
+      objectReference: {fileID: 0}
+    - target: {fileID: 7945908319452971428, guid: c8bb9f24a9ed08541a45b7bc699dacc0, type: 3}
+      propertyPath: m_MeshMass
+      value: 3.6
       objectReference: {fileID: 0}
     - target: {fileID: 7945908319452971428, guid: c8bb9f24a9ed08541a45b7bc699dacc0, type: 3}
       propertyPath: m_Substeps
