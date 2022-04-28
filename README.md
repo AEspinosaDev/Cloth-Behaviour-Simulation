@@ -43,7 +43,7 @@ Collisions with planes and spheres.
 
 Fixing by texture and fixing to another mesh supported.
 
-Inspector is self explanatory. All parameters explained and has instructions of what to do with some of them.
+Inspector is self explanatory. All parameters explained and it has instructions of what to do with some of them.
 
 It works by applying it to any plane mash as a component.
 
