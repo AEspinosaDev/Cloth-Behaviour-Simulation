@@ -25,7 +25,7 @@ Cloth simulation using a mass spring physics aproach.
 
 <H2>ABOUT THIS REPOSITORY</H2>
 
-In the source code you will find a sample scene in Unity.
+You will find a sample scene in Unity.
 
 Plugin comes as .unitypackage.
 
