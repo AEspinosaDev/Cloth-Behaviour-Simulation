@@ -276,6 +276,8 @@ public class ClothBehaviour : MonoBehaviour
         }
 
         m_Mesh.vertices = m_Vertices;
+
+        m_Mesh.RecalculateNormals();
     }
 
     public void FixedUpdate()
