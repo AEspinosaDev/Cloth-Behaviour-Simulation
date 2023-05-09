@@ -22,6 +22,7 @@ public class ClothBehaviorEditor : Editor
         SerializedProperty fixersList = serializedObject.FindProperty("m_Fixers");
         SerializedProperty collidingSp = serializedObject.FindProperty("m_CollidingMeshes");
 
+        serializedObject.Update();
 
         b.m_AffectedByWind = EditorGUILayout.Toggle("Affected By Wind", b.m_AffectedByWind);
 
@@ -47,6 +48,7 @@ public class ClothBehaviorEditor : Editor
         else
         {
             EditorGUILayout.PropertyField(fixersList);
+            serializedObject.ApplyModifiedProperties();
         }
 
         b.m_CanCollide = EditorGUILayout.Toggle("Can Collide", b.m_CanCollide);
